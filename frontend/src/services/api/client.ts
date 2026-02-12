@@ -1,4 +1,8 @@
-import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
+import axios, {
+  AxiosHeaders,
+  type AxiosError,
+  type InternalAxiosRequestConfig
+} from "axios";
 import { useAuthStore } from "@/stores/authStore";
 import { createIdempotencyKey } from "@/utils/id";
 
@@ -9,23 +13,25 @@ export const apiClient = axios.create({
   timeout: 15000
 });
 
-apiClient.interceptors.request.use((config: AxiosRequestConfig) => {
-  const next = { ...config };
+apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const next = config;
   const authState = useAuthStore.getState();
 
   if (!next.headers) {
-    next.headers = {};
+    next.headers = new AxiosHeaders();
+  } else if (!(next.headers instanceof AxiosHeaders)) {
+    next.headers = AxiosHeaders.from(next.headers);
   }
 
   if (authState.accessToken) {
-    next.headers.Authorization = `Bearer ${authState.accessToken}`;
+    next.headers.set("Authorization", `Bearer ${authState.accessToken}`);
   }
 
   const method = next.method?.toLowerCase();
   const isMutation = method === "post" || method === "put" || method === "patch" || method === "delete";
 
-  if (isMutation && !next.headers["x-idempotency-key"]) {
-    next.headers["x-idempotency-key"] = createIdempotencyKey("request");
+  if (isMutation && !next.headers.get("x-idempotency-key")) {
+    next.headers.set("x-idempotency-key", createIdempotencyKey("request"));
   }
 
   return next;
