@@ -1,0 +1,44 @@
+:root {
+  /* Primary palette – UDSM identity + student-focused calmness */
+  --color-primary: #6dd7fd;
+  --color-secondary: #f5ffff;
+  --color-success: #089000;
+  --color-accent: #4c00a4;
+  --color-warning: #f57c00;
+  --color-error: #c62828;
+
+  /* Neutrals */
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+  --color-border: #e0e0e0;
+  --color-background: #ffffff;
+  --color-surface: #f5ffff;
+
+  /* Typography */
+  --font-family: "Roboto", system-ui, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 28px;
+
+  /* Spacing (8dp grid) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Borders */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+
+  /* Shadows */
+  --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-elevation-2: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+
+  /* Touch targets */
+  --touch-target-min: 48px;
+}
