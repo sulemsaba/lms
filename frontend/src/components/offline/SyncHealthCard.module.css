@@ -1,0 +1,32 @@
+.card {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.healthy {
+  background: var(--color-success);
+}
+
+.pending {
+  background: var(--color-warning);
+}
+
+.stale {
+  background: var(--color-error);
+}

@@ -1,0 +1,8 @@
+.stack {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.muted {
+  color: var(--color-text-secondary);
+}

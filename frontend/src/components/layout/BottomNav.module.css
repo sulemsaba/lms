@@ -1,0 +1,10 @@
+.container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  z-index: 20;
+}
