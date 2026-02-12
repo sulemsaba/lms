@@ -23,19 +23,19 @@ export default function ReceiptDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const fallbackReceipt: Receipt = {
-    id: id ?? "unknown",
-    code: `UDSM-${id ?? "UNKNOWN"}`,
-    course: "Unknown Course",
-    assessmentTitle: "Unknown Assessment",
-    timestamp: new Date().toISOString(),
-    status: "saved_offline",
-    studentName: "Student"
-  };
-
   const receipt = useMemo(
-    () => mockReceipts.find((item) => item.id === id) ?? fallbackReceipt,
-    [fallbackReceipt, id]
+    () =>
+      mockReceipts.find((item) => item.id === id) ??
+      ({
+        id: id ?? "unknown",
+        code: `UDSM-${id ?? "UNKNOWN"}`,
+        course: "Unknown Course",
+        assessmentTitle: "Unknown Assessment",
+        timestamp: new Date().toISOString(),
+        status: "saved_offline",
+        studentName: "Student"
+      } satisfies Receipt),
+    [id]
   );
 
   return (
