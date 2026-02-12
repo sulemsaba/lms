@@ -1,0 +1,18 @@
+:root {
+  --udsm-color-bg: #f3f8fb;
+  --udsm-color-surface: #ffffff;
+  --udsm-color-text: #212121;
+  --udsm-color-primary: #6dd7fd;
+  --udsm-color-border: #cfd8dc;
+  --udsm-color-success: #2e7d32;
+  --udsm-color-warning: #ed6c02;
+  --udsm-color-error: #d32f2f;
+
+  --udsm-space-2: 8px;
+  --udsm-space-3: 12px;
+  --udsm-space-4: 16px;
+  --udsm-space-6: 24px;
+
+  --udsm-radius-sm: 8px;
+  --udsm-radius-md: 12px;
+}

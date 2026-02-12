@@ -1,0 +1,95 @@
+@import "../../../../design-system/platform/web/tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, Arial, sans-serif;
+  background: var(--udsm-color-bg);
+  color: var(--udsm-color-text);
+}
+
+.app-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: var(--udsm-space-6) var(--udsm-space-4) 96px;
+}
+
+.top-bar {
+  margin-bottom: var(--udsm-space-6);
+}
+
+.offline-banner {
+  background: #fff3e0;
+  border: 1px solid var(--udsm-color-warning);
+  border-radius: var(--udsm-radius-sm);
+  padding: var(--udsm-space-3);
+  margin-bottom: var(--udsm-space-4);
+}
+
+.status-card,
+.receipt-card {
+  background: var(--udsm-color-surface);
+  border: 1px solid var(--udsm-color-border);
+  border-radius: var(--udsm-radius-sm);
+  padding: var(--udsm-space-4);
+}
+
+.receipt-section {
+  margin-top: var(--udsm-space-6);
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--udsm-space-3);
+  align-items: center;
+}
+
+.status {
+  font-weight: 600;
+  color: var(--udsm-color-success);
+}
+
+.receipt-card[data-state="offline"] .status {
+  color: var(--udsm-color-warning);
+}
+
+.receipt-grid {
+  display: grid;
+  gap: var(--udsm-space-3);
+  margin-top: var(--udsm-space-3);
+}
+
+.receipt-grid dt {
+  font-size: 0.8rem;
+  color: #546e7a;
+}
+
+.receipt-grid dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--udsm-space-2);
+  padding: var(--udsm-space-3);
+  background: var(--udsm-color-surface);
+  border-top: 1px solid var(--udsm-color-border);
+}
+
+.bottom-nav button {
+  min-height: 48px;
+  border: 1px solid var(--udsm-color-border);
+  background: var(--udsm-color-surface);
+  border-radius: var(--udsm-radius-sm);
+}
