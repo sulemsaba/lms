@@ -100,3 +100,19 @@ export function registerOnlineSyncTrigger(): void {
     void syncWithExponentialBackoff();
   });
 }
+
+/**
+ * Listens for sync trigger messages from service worker.
+ */
+export function registerServiceWorkerSyncListener(): void {
+  if (!("serviceWorker" in navigator)) {
+    return;
+  }
+
+  navigator.serviceWorker.addEventListener("message", (event: MessageEvent<unknown>) => {
+    const payload = event.data as { type?: string } | undefined;
+    if (payload?.type === "SYNC_TRIGGER") {
+      void syncWithExponentialBackoff();
+    }
+  });
+}

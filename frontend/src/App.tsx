@@ -2,7 +2,10 @@ import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import { router } from "@/router";
 import { registerServiceWorker } from "@/services/sync/registerSW";
-import { registerOnlineSyncTrigger } from "@/services/sync/backgroundSync";
+import {
+  registerOnlineSyncTrigger,
+  registerServiceWorkerSyncListener
+} from "@/services/sync/backgroundSync";
 import { useSyncStore } from "@/stores/syncStore";
 
 /**
@@ -14,6 +17,7 @@ export default function App() {
   useEffect(() => {
     registerServiceWorker();
     registerOnlineSyncTrigger();
+    registerServiceWorkerSyncListener();
 
     const updateStatus = () => {
       setSyncStatus(navigator.onLine ? "online" : "offline");
