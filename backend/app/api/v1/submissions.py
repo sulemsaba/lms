@@ -116,11 +116,11 @@ async def get_attempt(
 async def create_result(
     result_in: AssessmentResultRead,
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> AssessmentResult:
     result = AssessmentResult(
-        id=result_in.id,
-        institution_id=result_in.user_id,
+        institution_id=current_user.institution_id,
+        created_by=current_user.id,
         attempt_id=result_in.attempt_id,
         user_id=result_in.user_id,
         total_score=result_in.total_score,
