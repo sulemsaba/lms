@@ -1,0 +1,11 @@
+.list {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  background: #fff;
+}

@@ -1,0 +1,9 @@
+.stack {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

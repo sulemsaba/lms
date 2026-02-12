@@ -1,0 +1,11 @@
+.grid {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
+}

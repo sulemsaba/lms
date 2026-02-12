@@ -1,0 +1,15 @@
+.form {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.input,
+.textarea {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm);
+}
+
+.textarea {
+  min-height: 120px;
+}
