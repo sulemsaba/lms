@@ -4,6 +4,7 @@ import os
 from collections.abc import AsyncGenerator
 
 import pytest
+import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 # Ensure tests do not require external infra by default.
@@ -25,7 +26,7 @@ def institution_id() -> str:
     return "22222222-2222-2222-2222-222222222222"
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def client() -> AsyncGenerator[AsyncClient, None]:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as async_client:
