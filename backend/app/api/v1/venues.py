@@ -21,7 +21,7 @@ async def list_venues(
     building: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> list[Venue]:
+) -> list[VenueRead]:
     stmt = select(Venue).where(Venue.deleted_at.is_(None))
     if campus:
         stmt = stmt.where(Venue.campus == campus)

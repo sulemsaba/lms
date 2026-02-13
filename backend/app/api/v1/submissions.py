@@ -28,7 +28,7 @@ async def start_attempt(
     payload: AssessmentAttemptCreate,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> AssessmentAttempt:
+) -> AssessmentAttemptRead:
     attempt = AssessmentAttempt(
         institution_id=current_user.institution_id,
         created_by=current_user.id,
@@ -75,7 +75,7 @@ async def submit_attempt(
     payload: SubmitAttemptRequest,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> AssessmentResult:
+) -> AssessmentResultRead:
     attempt_stmt = select(AssessmentAttempt).where(AssessmentAttempt.id == attempt_id, AssessmentAttempt.user_id == current_user.id)
     attempt = (await db.execute(attempt_stmt)).scalar_one_or_none()
     if attempt is None:
@@ -104,7 +104,7 @@ async def get_attempt(
     attempt_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> AssessmentAttempt:
+) -> AssessmentAttemptRead:
     stmt = select(AssessmentAttempt).where(AssessmentAttempt.id == attempt_id, AssessmentAttempt.user_id == current_user.id)
     attempt = (await db.execute(stmt)).scalar_one_or_none()
     if attempt is None:
@@ -117,7 +117,7 @@ async def create_result(
     result_in: AssessmentResultRead,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> AssessmentResult:
+) -> AssessmentResultRead:
     result = AssessmentResult(
         institution_id=current_user.institution_id,
         created_by=current_user.id,
@@ -139,7 +139,7 @@ async def regrade_result(
     payload: AssessmentResultRead,
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> AssessmentResult:
+) -> AssessmentResultRead:
     stmt = select(AssessmentResult).where(AssessmentResult.id == result_id)
     result = (await db.execute(stmt)).scalar_one_or_none()
     if result is None:

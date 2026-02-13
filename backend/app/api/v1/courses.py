@@ -16,7 +16,7 @@ router = APIRouter()
 async def list_courses(
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> list[Course]:
+) -> list[CourseRead]:
     stmt = select(Course).where(Course.deleted_at.is_(None)).order_by(Course.created_at.desc())
     return (await db.execute(stmt)).scalars().all()
 
@@ -26,7 +26,7 @@ async def create_course(
     payload: CourseCreate,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> Course:
+) -> CourseRead:
     stmt = select(Course).where(Course.institution_id == current_user.institution_id, Course.code == payload.code)
     if (await db.execute(stmt)).scalar_one_or_none() is not None:
         raise HTTPException(status_code=409, detail="Course code already exists")

@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/me", response_model=UserRead)
-async def get_me(current_user: User = Depends(get_current_user)) -> User:
+async def get_me(current_user: User = Depends(get_current_user)) -> UserRead:
     return current_user
 
 
@@ -21,7 +21,7 @@ async def get_me(current_user: User = Depends(get_current_user)) -> User:
 async def list_users(
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> list[User]:
+) -> list[UserRead]:
     stmt = select(User).where(User.deleted_at.is_(None)).order_by(User.created_at.desc())
     return (await db.execute(stmt)).scalars().all()
 
@@ -31,7 +31,7 @@ async def create_user(
     payload: UserCreate,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> User:
+) -> UserRead:
     existing_stmt = select(User).where(User.institution_id == current_user.institution_id, User.email == payload.email)
     if (await db.execute(existing_stmt)).scalar_one_or_none() is not None:
         raise HTTPException(status_code=409, detail="Email already exists")

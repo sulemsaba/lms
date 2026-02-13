@@ -20,7 +20,7 @@ async def list_assessments(
     assessment_status: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> list[Assessment]:
+) -> list[AssessmentRead]:
     stmt = select(Assessment).where(Assessment.deleted_at.is_(None))
     if course_id:
         stmt = stmt.where(Assessment.course_id == course_id)
@@ -35,7 +35,7 @@ async def create_assessment(
     payload: AssessmentCreate,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> Assessment:
+) -> AssessmentRead:
     assessment = Assessment(
         institution_id=current_user.institution_id,
         created_by=current_user.id,
@@ -59,7 +59,7 @@ async def get_assessment(
     assessment_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> Assessment:
+) -> AssessmentRead:
     stmt = select(Assessment).where(Assessment.id == assessment_id, Assessment.deleted_at.is_(None))
     assessment = (await db.execute(stmt)).scalar_one_or_none()
     if assessment is None:
@@ -72,7 +72,7 @@ async def publish_assessment(
     assessment_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> Assessment:
+) -> AssessmentRead:
     stmt = select(Assessment).where(Assessment.id == assessment_id, Assessment.deleted_at.is_(None))
     assessment = (await db.execute(stmt)).scalar_one_or_none()
     if assessment is None:
@@ -88,7 +88,7 @@ async def archive_assessment(
     assessment_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
     _: User = Depends(get_current_user),
-) -> Assessment:
+) -> AssessmentRead:
     stmt = select(Assessment).where(Assessment.id == assessment_id, Assessment.deleted_at.is_(None))
     assessment = (await db.execute(stmt)).scalar_one_or_none()
     if assessment is None:

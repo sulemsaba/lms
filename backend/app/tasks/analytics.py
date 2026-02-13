@@ -33,7 +33,7 @@ def process_engagement_batch() -> dict:
                     day=day,
                     metric_name=f"events.{event_type}",
                     metric_value=float(count),
-                    metadata={"source": "celery"},
+                    rollup_metadata={"source": "celery"},
                 )
                 db.add(rollup)
                 inserted += 1

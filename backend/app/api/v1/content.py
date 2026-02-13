@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db_with_tenant
-from app.models.content import CoursePack, Resource
+from app.models.content import Resource
 from app.models.iam import User
 from app.services.file import create_presigned_upload_url, object_key_for_resource
 from app.services.pack import PackService
@@ -42,5 +42,14 @@ async def generate_pack(
     course_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
     current_user: User = Depends(get_current_user),
-) -> CoursePack:
-    return await PackService(db).generate_course_pack(current_user.institution_id, current_user.id, course_id)
+) -> dict:
+    pack = await PackService(db).generate_course_pack(current_user.institution_id, current_user.id, course_id)
+    return {
+        "id": str(pack.id),
+        "course_id": str(pack.course_id),
+        "version": pack.version,
+        "manifest_hash": pack.manifest_hash,
+        "signed_manifest": pack.signed_manifest,
+        "storage_key": pack.storage_key,
+        "published_at": pack.published_at.isoformat() if pack.published_at else None,
+    }

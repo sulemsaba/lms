@@ -17,7 +17,7 @@ class EngagementEvent(TenantBase):
     event_value: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     source: Mapped[str] = mapped_column(String(64), nullable=False, default="app")
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
-    metadata: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    event_metadata: Mapped[dict] = mapped_column("metadata", JSON, nullable=False, default=dict)
 
 
 class StudentRiskScore(TenantBase):

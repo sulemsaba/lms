@@ -14,4 +14,4 @@ class AnalyticsRollup(TenantBase):
     day: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     metric_name: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     metric_value: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
-    metadata: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    rollup_metadata: Mapped[dict] = mapped_column("metadata", JSON, nullable=False, default=dict)
