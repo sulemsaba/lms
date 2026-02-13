@@ -6,6 +6,8 @@ from collections.abc import AsyncGenerator
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 # Ensure tests do not require external infra by default.
 os.environ.setdefault("ASYNC_DATABASE_URL", "sqlite+aiosqlite:///./test.db")
@@ -13,6 +15,8 @@ os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
 os.environ.setdefault("SYNC_DATABASE_URL", "sqlite:///./test.db")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/15")
 
+from app.api.deps import get_db
+from app.database.base import Base
 from app.main import app
 
 
@@ -38,3 +42,47 @@ def clear_dependency_overrides() -> None:
     app.dependency_overrides = {}
     yield
     app.dependency_overrides = {}
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    import asyncio
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.close()
+
+@pytest.fixture(scope="session")
+async def db_engine():
+    """yields a SQLAlchemy engine which is suppressed after the test session"""
+    engine = create_async_engine("sqlite+aiosqlite:///./test.db", echo=True)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield engine
+    # commented out to inspect the database after tests
+    # os.remove("./test.db")
+
+
+@pytest.fixture(scope="function")
+async def db_session(db_engine):
+    """yields a SQLAlchemy session which is rollbacked after the test"""
+    connection = await db_engine.connect()
+    # begin the nested transaction
+    await connection.begin()
+    # use the connection with the already started transaction
+    session = AsyncSession(bind=connection)
+
+    yield session
+
+    await session.close()
+    # roll back the broader transaction
+    await connection.rollback()
+    # put back the connection to the connection pool
+    await connection.close()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def override_get_db(db_session: AsyncSession):
+    async def _override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _override_get_db
