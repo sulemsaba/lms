@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.communication import Notification
 from app.models.iam import User
 from app.schemas.notification import NotificationCreate, NotificationRead
@@ -14,7 +14,7 @@ router = APIRouter()
 @router.get("/", response_model=list[NotificationRead])
 async def list_notifications(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("notification.read.own")),
 ):
     stmt = select(Notification).where(Notification.user_id == current_user.id).order_by(Notification.created_at.desc())
     return (await db.execute(stmt)).scalars().all()
@@ -24,7 +24,7 @@ async def list_notifications(
 async def create_notification(
     payload: NotificationCreate,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("notification.create")),
 ):
     service = NotificationService(db)
     notification = await service.create_notification(

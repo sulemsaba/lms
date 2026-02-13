@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.iam import User
 from app.models.offline import SyncConflict
 from app.schemas.sync import SyncBatchRequest, SyncBatchResult
@@ -20,7 +20,7 @@ router = APIRouter()
 async def batch_sync(
     payload: SyncBatchRequest,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("sync.batch.submit")),
 ):
     if not await AuthService(db).verify_device_trust(payload.device_id, payload.device_trust_token):
         raise HTTPException(status_code=401, detail="Invalid device trust token")
@@ -35,7 +35,7 @@ async def batch_sync(
 @router.get("/conflicts")
 async def list_conflicts(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("sync.conflicts.read.own")),
 ):
     stmt = select(SyncConflict).where(
         SyncConflict.user_id == current_user.id,
@@ -49,7 +49,7 @@ async def resolve_conflict(
     conflict_id: UUID,
     strategy: str,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("sync.conflicts.resolve.own")),
 ):
     conflict = await SyncService(db).resolve_conflict(conflict_id=conflict_id, resolver_id=current_user.id, strategy=strategy)
     if conflict is None:

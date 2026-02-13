@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.academics import UserSkill
 from app.models.iam import User
 from app.models.student_success import AcademicStreak, StudentRiskScore, UserBadge
@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("/risk")
 async def get_risk(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("student_success.read.own")),
 ):
     stmt = (
         select(StudentRiskScore)
@@ -30,7 +30,7 @@ async def get_risk(
 @router.get("/streaks")
 async def get_streaks(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("student_success.read.own")),
 ):
     stmt = select(AcademicStreak).where(AcademicStreak.user_id == current_user.id)
     return (await db.execute(stmt)).scalars().all()
@@ -39,7 +39,7 @@ async def get_streaks(
 @router.get("/badges")
 async def get_badges(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("student_success.read.own")),
 ):
     stmt = select(UserBadge).where(UserBadge.user_id == current_user.id)
     return (await db.execute(stmt)).scalars().all()
@@ -48,7 +48,7 @@ async def get_badges(
 @router.get("/skills")
 async def get_skills(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("student_success.read.own")),
 ):
     stmt = select(UserSkill).where(UserSkill.user_id == current_user.id)
     return (await db.execute(stmt)).scalars().all()
@@ -57,7 +57,7 @@ async def get_skills(
 @router.get("/dashboard")
 async def get_dashboard(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("student_success.read.own")),
 ):
     risk_stmt = (
         select(StudentRiskScore)

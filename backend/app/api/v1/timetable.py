@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.iam import User
 from app.models.timetable import TimetableEvent
 
@@ -29,7 +29,7 @@ def _event_to_dict(event: TimetableEvent) -> dict:
 @router.get("/")
 async def list_events(
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_permission("timetable.read")),
 ) -> list[dict]:
     stmt = select(TimetableEvent).where(TimetableEvent.deleted_at.is_(None)).order_by(TimetableEvent.starts_at.asc())
     events = (await db.execute(stmt)).scalars().all()
@@ -44,7 +44,7 @@ async def create_event(
     course_id: str | None = None,
     venue_id: str | None = None,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("timetable.write")),
 ) -> dict:
     event = TimetableEvent(
         institution_id=current_user.institution_id,

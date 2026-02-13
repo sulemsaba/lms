@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Card from "@/components/ui/Card";
 import { useAuthStore } from "@/stores/authStore";
 import styles from "./ProfilePage.module.css";
@@ -25,6 +26,9 @@ export default function ProfilePage() {
       <Card>
         <h2>Data Usage</h2>
         <p>Low-data mode is enabled for media and map resources.</p>
+        <p>
+          <Link to="/rbac-matrix">Open RBAC matrix</Link>
+        </p>
       </Card>
     </div>
   );

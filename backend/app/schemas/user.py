@@ -13,6 +13,9 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    role_code: str = "student"
+    role_scope_type: str | None = None
+    role_scope_id: UUID | None = None
 
 
 class UserRead(UserBase):

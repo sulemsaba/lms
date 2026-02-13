@@ -20,11 +20,11 @@ Production implementation workspace for the UDSM LMS (COICT + UDBS + CoHU) pilot
    - `pip install -e .[dev]`
    - `uvicorn apps.api.main:app --reload --port 8000`
 3. Frontend:
-   - `cd frontend/apps/student-hub`
+   - `cd frontend`
    - `npm install`
    - `npm run dev`
 
 ## Notes
 
 - `lms.html` is retained only as a legacy prototype reference.
-- New development should target `frontend/apps/student-hub`.
+- New development should target `frontend/src` (run from `frontend/`).

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.academics import Assessment
 from app.models.iam import User
 from app.schemas.assessment import AssessmentCreate, AssessmentRead
@@ -19,7 +19,7 @@ async def list_assessments(
     course_id: UUID | None = Query(default=None),
     assessment_status: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_permission("assessment.read")),
 ) -> list[AssessmentRead]:
     stmt = select(Assessment).where(Assessment.deleted_at.is_(None))
     if course_id:
@@ -34,7 +34,7 @@ async def list_assessments(
 async def create_assessment(
     payload: AssessmentCreate,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("assessment.create")),
 ) -> AssessmentRead:
     assessment = Assessment(
         institution_id=current_user.institution_id,
@@ -58,7 +58,7 @@ async def create_assessment(
 async def get_assessment(
     assessment_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_permission("assessment.read")),
 ) -> AssessmentRead:
     stmt = select(Assessment).where(Assessment.id == assessment_id, Assessment.deleted_at.is_(None))
     assessment = (await db.execute(stmt)).scalar_one_or_none()
@@ -71,7 +71,7 @@ async def get_assessment(
 async def publish_assessment(
     assessment_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_permission("grade.release")),
 ) -> AssessmentRead:
     stmt = select(Assessment).where(Assessment.id == assessment_id, Assessment.deleted_at.is_(None))
     assessment = (await db.execute(stmt)).scalar_one_or_none()
@@ -87,7 +87,7 @@ async def publish_assessment(
 async def archive_assessment(
     assessment_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_permission("assessment.create")),
 ) -> AssessmentRead:
     stmt = select(Assessment).where(Assessment.id == assessment_id, Assessment.deleted_at.is_(None))
     assessment = (await db.execute(stmt)).scalar_one_or_none()

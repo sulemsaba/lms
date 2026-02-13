@@ -13,30 +13,126 @@ from sqlalchemy import select, text
 from app.api import api_router
 from app.config import get_settings
 from app.core.middleware import RateLimitMiddleware, RequestContextMiddleware
+from app.core.rbac import PERMISSION_DEFINITIONS, ROLE_DEFINITIONS_BY_CODE
 from app.database import Base
 from app.database.session import AsyncSessionFactory, engine
-from app.models.iam import Institution, Permission, Role
+from app.models.iam import Institution, Permission, Role, RoleBinding, RolePermission, User
 from app.models.student_success import Badge, Quote
 from app.utils.logging import configure_logging
 
 settings = get_settings()
 
 
-def _bootstrap_roles() -> list[tuple[str, str]]:
-    return [
-        ("student", "Student role"),
-        ("lecturer", "Lecturer role"),
-        ("admin", "Institution admin role"),
-    ]
+async def _bootstrap_rbac(institution: Institution) -> None:
+    async with AsyncSessionFactory() as db:
+        roles_by_code: dict[str, Role] = {}
+        for role_code, definition in ROLE_DEFINITIONS_BY_CODE.items():
+            existing_role = (
+                await db.execute(
+                    select(Role).where(
+                        Role.institution_id == institution.id,
+                        Role.code == role_code,
+                        Role.deleted_at.is_(None),
+                    )
+                )
+            ).scalar_one_or_none()
+            if existing_role is None:
+                existing_role = Role(
+                    institution_id=institution.id,
+                    code=role_code,
+                    description=definition.description,
+                )
+                db.add(existing_role)
+                await db.flush()
+            roles_by_code[role_code] = existing_role
 
+        permissions_by_code: dict[str, Permission] = {}
+        for permission_code, description in PERMISSION_DEFINITIONS.items():
+            existing_permission = (
+                await db.execute(
+                    select(Permission).where(
+                        Permission.institution_id == institution.id,
+                        Permission.code == permission_code,
+                        Permission.deleted_at.is_(None),
+                    )
+                )
+            ).scalar_one_or_none()
+            if existing_permission is None:
+                existing_permission = Permission(
+                    institution_id=institution.id,
+                    code=permission_code,
+                    description=description,
+                )
+                db.add(existing_permission)
+                await db.flush()
+            permissions_by_code[permission_code] = existing_permission
 
-def _bootstrap_permissions() -> list[tuple[str, str]]:
-    return [
-        ("admin.conflicts", "Resolve sync conflicts"),
-        ("admin.receipts", "Inspect receipt chains"),
-        ("assessments.create", "Create assessments"),
-        ("submissions.grade", "Grade submissions"),
-    ]
+        existing_mappings = {
+            (mapping.role_id, mapping.permission_id)
+            for mapping in (
+                await db.execute(
+                    select(RolePermission).where(
+                        RolePermission.institution_id == institution.id,
+                        RolePermission.deleted_at.is_(None),
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        }
+
+        for role_code, definition in ROLE_DEFINITIONS_BY_CODE.items():
+            role = roles_by_code[role_code]
+            for permission_code in definition.permissions:
+                permission = permissions_by_code[permission_code]
+                key = (role.id, permission.id)
+                if key in existing_mappings:
+                    continue
+                db.add(
+                    RolePermission(
+                        institution_id=institution.id,
+                        role_id=role.id,
+                        permission_id=permission.id,
+                    )
+                )
+                existing_mappings.add(key)
+
+        admin_user = (
+            await db.execute(
+                select(User).where(
+                    User.institution_id == institution.id,
+                    User.email == "admin@udsm.ac.tz",
+                    User.deleted_at.is_(None),
+                )
+            )
+        ).scalar_one_or_none()
+        super_admin_role = roles_by_code.get("super_admin")
+        if admin_user is not None and super_admin_role is not None:
+            existing_binding = (
+                await db.execute(
+                    select(RoleBinding).where(
+                        RoleBinding.institution_id == institution.id,
+                        RoleBinding.user_id == admin_user.id,
+                        RoleBinding.role_id == super_admin_role.id,
+                        RoleBinding.scope_type == "institution",
+                        RoleBinding.deleted_at.is_(None),
+                    )
+                )
+            ).scalar_one_or_none()
+            if existing_binding is None:
+                db.add(
+                    RoleBinding(
+                        institution_id=institution.id,
+                        created_by=admin_user.id,
+                        user_id=admin_user.id,
+                        role_id=super_admin_role.id,
+                        scope_type="institution",
+                        scope_id=None,
+                        active=True,
+                    )
+                )
+
+        await db.commit()
 
 
 def _bootstrap_badges() -> list[tuple[str, str, float]]:
@@ -81,24 +177,6 @@ async def lifespan(app: FastAPI):
             await db.flush()
             institution.institution_id = institution.id
 
-        for role_code, description in _bootstrap_roles():
-            exists = (
-                await db.execute(
-                    select(Role).where(Role.institution_id == institution.id, Role.code == role_code)
-                )
-            ).scalar_one_or_none()
-            if exists is None:
-                db.add(Role(institution_id=institution.id, code=role_code, description=description))
-
-        for permission_code, description in _bootstrap_permissions():
-            exists = (
-                await db.execute(
-                    select(Permission).where(Permission.institution_id == institution.id, Permission.code == permission_code)
-                )
-            ).scalar_one_or_none()
-            if exists is None:
-                db.add(Permission(institution_id=institution.id, code=permission_code, description=description))
-
         for code, name, threshold in _bootstrap_badges():
             exists = (
                 await db.execute(select(Badge).where(Badge.institution_id == institution.id, Badge.code == code))
@@ -112,6 +190,8 @@ async def lifespan(app: FastAPI):
                 db.add(Quote(institution_id=institution.id, text=text_value, author=author, language="en", active=True))
 
         await db.commit()
+
+    await _bootstrap_rbac(institution)
 
     yield
 

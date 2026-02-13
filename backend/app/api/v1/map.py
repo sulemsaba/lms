@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.iam import User
 from app.services.venue import VenueService
 
@@ -13,7 +13,7 @@ async def route_preview(
     from_venue_id: str,
     to_venue_id: str,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("map.read")),
 ) -> dict:
     route = await VenueService(db).get_route(current_user.institution_id, from_venue_id, to_venue_id)
     return {

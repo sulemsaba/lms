@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user, get_db_with_tenant
+from app.api.deps import get_db_with_tenant, require_permission
 from app.models.iam import User
 from app.models.receipts import Receipt
 from app.schemas.receipt import ReceiptRead, ReceiptVerifyResponse
@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get("/", response_model=list[ReceiptRead])
 async def list_receipts(
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("receipt.read.own")),
 ):
     stmt = select(Receipt).where(Receipt.user_id == current_user.id).order_by(Receipt.timestamp.desc())
     return (await db.execute(stmt)).scalars().all()
@@ -28,7 +28,7 @@ async def list_receipts(
 async def get_receipt(
     code: str,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("receipt.read.own")),
 ):
     stmt = select(Receipt).where(Receipt.receipt_code == code, Receipt.institution_id == current_user.institution_id)
     receipt = (await db.execute(stmt)).scalar_one_or_none()
@@ -41,7 +41,7 @@ async def get_receipt(
 async def verify_receipt(
     code: str,
     db: AsyncSession = Depends(get_db_with_tenant),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission("receipt.verify.public")),
 ):
     stmt = select(Receipt).where(Receipt.receipt_code == code, Receipt.institution_id == current_user.institution_id)
     receipt = (await db.execute(stmt)).scalar_one_or_none()
@@ -60,7 +60,7 @@ async def verify_receipt(
 async def get_chain(
     user_id: UUID,
     db: AsyncSession = Depends(get_db_with_tenant),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_permission("receipt.read.scope")),
 ):
     stmt = select(Receipt).where(Receipt.user_id == user_id).order_by(Receipt.chain_position.asc())
     return (await db.execute(stmt)).scalars().all()

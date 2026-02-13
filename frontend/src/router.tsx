@@ -10,6 +10,7 @@ import TimetablePage from "@/features/timetable/TimetablePage";
 import HelpdeskPage from "@/features/helpdesk/HelpdeskPage";
 import LoginPage from "@/features/auth/LoginPage";
 import OfflinePinPage from "@/features/auth/OfflinePinPage";
+import RbacMatrixPage from "@/features/admin/RbacMatrixPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage /> },
       { path: "timetable", element: <TimetablePage /> },
       { path: "helpdesk", element: <HelpdeskPage /> },
+      { path: "rbac-matrix", element: <RbacMatrixPage /> },
       { path: "receipts/:id", element: <ReceiptDetailPage /> }
     ]
   },

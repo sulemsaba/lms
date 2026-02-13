@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run dev:info && npm run dev:raw",
+    "dev:raw": "vite --host 127.0.0.1 --port 5174",
+    "dev:info": "node -e \"console.log('\\nIMPORTANT: This is the REAL app <-\\nIgnore frontend/apps/student-hub/\\nOpen: http://127.0.0.1:5174/courses\\n')\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

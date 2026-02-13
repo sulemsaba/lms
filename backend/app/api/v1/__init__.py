@@ -10,6 +10,7 @@ from app.api.v1 import (
     map,
     notifications,
     public,
+    rbac,
     receipts,
     student_success,
     submissions,
@@ -36,3 +37,4 @@ api_router.include_router(student_success.router, prefix="/student", tags=["stud
 api_router.include_router(sync.router, prefix="/sync", tags=["sync"])
 api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
 api_router.include_router(public.router, prefix="/public", tags=["public"])
+api_router.include_router(rbac.router, prefix="/rbac", tags=["rbac"])

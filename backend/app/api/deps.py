@@ -5,11 +5,12 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import and_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db, set_tenant_context
-from app.models.iam import RoleBinding, User
+from app.models.iam import User
+from app.services.rbac import RbacService
 from app.utils.security import decode_token
 
 security = HTTPBearer(auto_error=True)
@@ -64,26 +65,26 @@ async def get_db_with_tenant(
 
 def require_permission(permission_code: str, scope_type: str | None = None) -> Callable:
     async def dependency(
+        request: Request,
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db_with_tenant),
-    ) -> None:
-        stmt = (
-            select(RoleBinding)
-            .where(
-                RoleBinding.user_id == current_user.id,
-                RoleBinding.institution_id == current_user.institution_id,
-                RoleBinding.active.is_(True),
-            )
-            .limit(1)
+    ) -> User:
+        requested_scope_type = scope_type or request.headers.get("x-scope-type")
+        requested_scope_id = request.headers.get("x-scope-id")
+
+        service = RbacService(db)
+        has_permission = await service.user_has_permission(
+            user=current_user,
+            permission_code=permission_code,
+            scope_type=requested_scope_type,
+            scope_id=requested_scope_id,
         )
-        binding = (await db.execute(stmt)).scalar_one_or_none()
-        if binding is None:
+        if not has_permission:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
 
-        if scope_type is not None and binding.scope_type not in {scope_type, "institution"}:
+        if scope_type is not None and requested_scope_type is not None and requested_scope_type != scope_type:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Scope mismatch")
 
-        if permission_code.startswith("admin") and binding.scope_type != "institution":
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin permission required")
+        return current_user
 
     return dependency
