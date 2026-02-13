@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from datetime import date
 from uuid import uuid4
 
 from fastapi import FastAPI
@@ -184,7 +183,9 @@ async def lifespan(app: FastAPI):
             if exists is None:
                 db.add(Badge(institution_id=institution.id, code=code, name=name, threshold=threshold))
 
-        existing_quotes = (await db.execute(select(Quote).where(Quote.institution_id == institution.id))).scalars().all()
+        existing_quotes = (
+            await db.execute(select(Quote).where(Quote.institution_id == institution.id))
+        ).scalars().all()
         if not existing_quotes:
             for text_value, author in _bootstrap_quotes():
                 db.add(Quote(institution_id=institution.id, text=text_value, author=author, language="en", active=True))

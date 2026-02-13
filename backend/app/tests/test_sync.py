@@ -8,6 +8,7 @@ import pytest
 from app.api import deps
 from app.main import app
 from app.services.auth import AuthService
+from app.services.rbac import RbacService
 from app.services.sync import SyncService
 
 
@@ -42,8 +43,14 @@ async def test_sync_batch_success(client):
 
     original_verify = AuthService.verify_device_trust
     original_process = SyncService.process_batch
+    original_has_permission = RbacService.user_has_permission
     AuthService.verify_device_trust = mock_verify_device_trust
     SyncService.process_batch = mock_process_batch
+
+    async def mock_user_has_permission(self, *, user, permission_code, scope_type=None, scope_id=None):
+        return True
+
+    RbacService.user_has_permission = mock_user_has_permission
 
     try:
         response = await client.post(
@@ -66,6 +73,7 @@ async def test_sync_batch_success(client):
     finally:
         AuthService.verify_device_trust = original_verify
         SyncService.process_batch = original_process
+        RbacService.user_has_permission = original_has_permission
 
     assert response.status_code == 200
     payload = response.json()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import and_, or_, select
@@ -18,7 +18,7 @@ class RbacService:
         if binding.scope_type == "institution":
             return True
         if scope_type is None:
-            return True
+            return False
         if binding.scope_type != scope_type:
             return False
         if scope_id is None:
@@ -81,7 +81,7 @@ class RbacService:
         scope_type: str | None = None,
         scope_id: str | None = None,
     ) -> bool:
-        now = datetime.now(datetime.UTC)
+        now = datetime.now(UTC)
         stmt = (
             select(RoleBinding, Role.code)
             .join(
@@ -127,7 +127,7 @@ class RbacService:
         return False
 
     async def get_user_permissions(self, *, user: User) -> list[str]:
-        now = datetime.now(datetime.UTC)
+        now = datetime.now(UTC)
         stmt = (
             select(Permission.code)
             .join(
@@ -154,7 +154,7 @@ class RbacService:
         return [row[0] for row in (await self.db.execute(stmt)).all()]
 
     async def get_user_bindings(self, *, user: User) -> list[RoleBinding]:
-        now = datetime.now(datetime.UTC)
+        now = datetime.now(UTC)
         stmt = select(RoleBinding).where(
             RoleBinding.institution_id == user.institution_id,
             RoleBinding.user_id == user.id,

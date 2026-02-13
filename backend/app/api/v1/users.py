@@ -43,6 +43,10 @@ async def create_user(
         raise HTTPException(status_code=400, detail="Unsupported role code")
 
     scope_type = payload.role_scope_type or role_definition.scope_type
+    if scope_type != role_definition.scope_type:
+        raise HTTPException(status_code=400, detail="Invalid role scope type")
+    if scope_type != "institution" and payload.role_scope_id is None:
+        raise HTTPException(status_code=400, detail="scope id is required for non-institution roles")
 
     user = User(
         institution_id=current_user.institution_id,

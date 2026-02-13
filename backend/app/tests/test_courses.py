@@ -8,6 +8,7 @@ import pytest
 
 from app.api import deps
 from app.main import app
+from app.services.rbac import RbacService
 
 
 class _ScalarResult:
@@ -54,7 +55,17 @@ async def test_list_courses_success(client):
     app.dependency_overrides[deps.get_db_with_tenant] = override_db
     app.dependency_overrides[deps.get_current_user] = override_user
 
-    response = await client.get("/api/v1/courses/")
+    original_has_permission = RbacService.user_has_permission
+
+    async def mock_user_has_permission(self, *, user, permission_code, scope_type=None, scope_id=None):
+        return True
+
+    RbacService.user_has_permission = mock_user_has_permission
+    try:
+        response = await client.get("/api/v1/courses/")
+    finally:
+        RbacService.user_has_permission = original_has_permission
+
     assert response.status_code == 200
     payload = response.json()
     assert len(payload) == 1

@@ -7,7 +7,6 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 
 # Ensure tests do not require external infra by default.
 os.environ.setdefault("ASYNC_DATABASE_URL", "sqlite+aiosqlite:///./test.db")
@@ -51,7 +50,7 @@ def event_loop():
     yield loop
     loop.close()
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def db_engine():
     """yields a SQLAlchemy engine which is suppressed after the test session"""
     engine = create_async_engine("sqlite+aiosqlite:///./test.db", echo=True)
@@ -62,7 +61,7 @@ async def db_engine():
     # os.remove("./test.db")
 
 
-@pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
 async def db_session(db_engine):
     """yields a SQLAlchemy session which is rollbacked after the test"""
     connection = await db_engine.connect()

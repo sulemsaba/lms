@@ -8,6 +8,7 @@ Production-oriented FastAPI backend for the UDSM LMS / Student Hub.
 - Async SQLAlchemy + PostgreSQL + Alembic
 - Redis-backed idempotency and Celery task processing
 - JWT auth with device trust workflow
+- Scope-based RBAC (roles, permissions, role bindings, role-permission grants)
 - Offline sync batch processing with conflict recording
 - Receipt generation with Merkle-like hash chaining
 - Student success services (risk, streaks, badges, skills)
@@ -39,6 +40,11 @@ Production-oriented FastAPI backend for the UDSM LMS / Student Hub.
 - Swagger: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 - Metrics: `http://localhost:8000/metrics`
+
+## RBAC Quick Check
+
+- `GET /api/v1/rbac/me` -> effective roles/permissions for current user
+- `GET /api/v1/rbac/matrix` -> role-to-permission matrix (requires `system.users_roles.manage`)
 
 ## Testing
 
