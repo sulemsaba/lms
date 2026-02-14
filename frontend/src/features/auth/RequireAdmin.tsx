@@ -1,7 +1,11 @@
 import type { ReactElement } from "react";
 import { Navigate } from "react-router-dom";
 import { canAccessAdminArea } from "@/features/auth/roleAccess";
-import { useAuthStore } from "@/stores/authStore";
+import {
+  selectEffectivePermissions,
+  selectEffectiveRoleCodes,
+  useAuthStore
+} from "@/stores/authStore";
 
 interface RequireAdminProps {
   children: ReactElement;
@@ -11,8 +15,8 @@ interface RequireAdminProps {
  * Restricts admin routes to users with admin roles/permissions.
  */
 export default function RequireAdmin({ children }: RequireAdminProps) {
-  const roleCodes = useAuthStore((state) => state.roleCodes);
-  const permissions = useAuthStore((state) => state.permissions);
+  const roleCodes = useAuthStore(selectEffectiveRoleCodes);
+  const permissions = useAuthStore(selectEffectivePermissions);
 
   if (!canAccessAdminArea(roleCodes, permissions)) {
     return <Navigate to="/" replace />;

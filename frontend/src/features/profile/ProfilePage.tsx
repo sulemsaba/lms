@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { formatRoleLabel } from "@/features/auth/roleAccess";
-import { useAuthStore } from "@/stores/authStore";
+import RoleSwitcherCard from "@/features/profile/RoleSwitcherCard";
+import { selectEffectiveRoleCodes, useAuthStore } from "@/stores/authStore";
 import styles from "./ProfilePage.module.css";
 
 /**
@@ -14,6 +14,8 @@ export default function ProfilePage() {
   const institutionId = useAuthStore((state) => state.institutionId);
   const deviceId = useAuthStore((state) => state.deviceId);
   const roleCodes = useAuthStore((state) => state.roleCodes);
+  const effectiveRoleCodes = useAuthStore(selectEffectiveRoleCodes);
+  const impersonatedRoleCode = useAuthStore((state) => state.impersonatedRoleCode);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const navigate = useNavigate();
 
@@ -42,7 +44,15 @@ export default function ProfilePage() {
           <span>Roles</span>
           <strong>{roleCodes.length > 0 ? roleCodes.map(formatRoleLabel).join(", ") : "Not loaded"}</strong>
         </div>
+        <div className={styles.row}>
+          <span>Effective Role</span>
+          <strong>
+            {effectiveRoleCodes.length > 0 ? formatRoleLabel(effectiveRoleCodes[0]) : "Not loaded"}
+            {impersonatedRoleCode ? " (Impersonated)" : ""}
+          </strong>
+        </div>
       </Card>
+      <RoleSwitcherCard />
       <Card>
         <h2>Data Usage</h2>
         <p>Low-data mode is enabled for media and map resources.</p>
