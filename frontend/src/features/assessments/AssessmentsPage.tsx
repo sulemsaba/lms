@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import ReceiptCard from "@/components/receipts/ReceiptCard";
 import SkeletonLoader from "@/components/ui/SkeletonLoader";
+import { db } from "@/services/db";
 import type { Receipt } from "@/types";
 import { submitAssessment } from "@/services/api/assessmentsApi";
 import styles from "./AssessmentsPage.module.css";
@@ -25,12 +26,30 @@ const initialReceipts: Receipt[] = [
 export default function AssessmentsPage() {
   const [loading, setLoading] = useState(true);
   const [receipts, setReceipts] = useState<Receipt[]>(initialReceipts);
+  const [sourceLabel, setSourceLabel] = useState("");
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
+    let mounted = true;
+    const load = async () => {
+      const cachedReceipts = await db.receipts.orderBy("timestamp").reverse().toArray();
+      if (!mounted) {
+        return;
+      }
+      if (cachedReceipts.length > 0) {
+        setReceipts(cachedReceipts);
+        setSourceLabel("Showing saved receipts from offline storage.");
+      } else {
+        await db.receipts.bulkPut(initialReceipts);
+        setReceipts(initialReceipts);
+        setSourceLabel("Local receipt cache initialized.");
+      }
       setLoading(false);
-    }, 300);
-    return () => window.clearTimeout(timer);
+    };
+
+    void load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleMockSubmit = async () => {
@@ -51,6 +70,7 @@ export default function AssessmentsPage() {
       <div className={styles.actions}>
         <Button onClick={() => void handleMockSubmit()}>Submit mock assessment</Button>
       </div>
+      {sourceLabel ? <p className={styles.hint}>{sourceLabel}</p> : null}
       {receipts.map((receipt) => (
         <div key={receipt.id}>
           <ReceiptCard receipt={receipt} />
