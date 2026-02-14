@@ -29,6 +29,12 @@ export default function ProfilePage() {
         <p>
           <Link to="/rbac-matrix">Open RBAC matrix</Link>
         </p>
+        <p>
+          <Link to="/login">Open login page</Link>
+        </p>
+        <p>
+          <Link to="/offline-pin">Open offline PIN page</Link>
+        </p>
       </Card>
     </div>
   );

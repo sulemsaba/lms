@@ -1,11 +1,12 @@
 .shell {
+  --bottom-nav-height: 120px;
   min-height: 100vh;
   background: var(--color-background);
 }
 
 .content {
   padding: var(--spacing-md);
-  padding-bottom: calc(var(--touch-target-min) + var(--spacing-xl));
+  padding-bottom: calc(var(--bottom-nav-height) + var(--spacing-md));
   display: grid;
   gap: var(--spacing-md);
 }

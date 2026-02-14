@@ -5,6 +5,6 @@
   right: 0;
   background: #fff;
   border-top: 1px solid var(--color-border);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm) calc(var(--spacing-xs) + env(safe-area-inset-bottom));
   z-index: 20;
 }

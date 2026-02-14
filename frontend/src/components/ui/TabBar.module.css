@@ -1,18 +1,12 @@
 .tabBar {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--spacing-xs);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.tabBar::-webkit-scrollbar {
-  display: none;
 }
 
 .item {
-  flex: 0 0 72px;
   min-height: var(--touch-target-min);
+  padding: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,6 +15,7 @@
   border-radius: var(--border-radius-md);
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
+  text-align: center;
 }
 
 .active {
