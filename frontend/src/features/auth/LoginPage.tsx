@@ -45,11 +45,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [institutionId, setInstitutionId] = useState(storedInstitutionId ?? envInstitutionId);
   const [demoRole, setDemoRole] = useState("student");
+  const [offlinePin, setOfflinePin] = useState("");
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
   const setSession = useAuthStore((state) => state.setSession);
   const setAuthorization = useAuthStore((state) => state.setAuthorization);
   const registerDevice = useAuthStore((state) => state.registerDevice);
+  const roleCodes = useAuthStore((state) => state.roleCodes);
+  const permissions = useAuthStore((state) => state.permissions);
+  const verifyOfflinePin = useAuthStore((state) => state.verifyOfflinePin);
+  const unlockOfflineSession = useAuthStore((state) => state.unlockOfflineSession);
   const navigate = useNavigate();
 
   const onSignIn = async () => {
@@ -106,6 +111,22 @@ export default function LoginPage() {
     navigate(getLandingPath([demoRole], []), { replace: true });
   };
 
+  const onOfflineUnlock = () => {
+    if (!offlinePin) {
+      setFeedback("Enter your offline PIN first.");
+      return;
+    }
+
+    if (!verifyOfflinePin(offlinePin)) {
+      setFeedback("Offline PIN does not match this device.");
+      return;
+    }
+
+    unlockOfflineSession();
+    const effectiveRoles = roleCodes.length > 0 ? roleCodes : [demoRole];
+    navigate(getLandingPath(effectiveRoles, permissions), { replace: true });
+  };
+
   return (
     <Card>
       <div className={styles.stack}>
@@ -153,12 +174,25 @@ export default function LoginPage() {
           </select>
         </label>
 
+        <label className={styles.field}>
+          <span>Offline PIN (optional)</span>
+          <input
+            type="password"
+            value={offlinePin}
+            onChange={(event) => setOfflinePin(event.target.value)}
+            placeholder="Unlock cached session offline"
+          />
+        </label>
+
         <div className={styles.actions}>
           <Button onClick={() => void onSignIn()} loading={loading}>
             Sign In
           </Button>
           <Button variant="secondary" onClick={onDemoMode} disabled={loading}>
             Continue In Demo Mode
+          </Button>
+          <Button variant="text" onClick={onOfflineUnlock} disabled={loading}>
+            Unlock Offline Session
           </Button>
         </div>
 

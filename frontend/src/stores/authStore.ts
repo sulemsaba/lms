@@ -19,6 +19,7 @@ export interface AuthState {
   setAuthorization: (roleCodes: string[], permissions: string[]) => void;
   startImpersonation: (roleCode: string, permissions: string[]) => void;
   stopImpersonation: () => void;
+  unlockOfflineSession: () => void;
   clearAuth: () => void;
   registerDevice: (deviceId: string) => void;
   setOfflinePin: (pin: string) => void;
@@ -91,6 +92,10 @@ export const useAuthStore = create<AuthState>()(
         set({
           impersonatedRoleCode: null,
           impersonatedPermissions: []
+        }),
+      unlockOfflineSession: () =>
+        set({
+          isAuthenticated: true
         }),
       clearAuth: () =>
         set({
