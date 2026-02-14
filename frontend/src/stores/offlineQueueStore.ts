@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { db, type OfflineAction } from "@/services/db";
+import { useSyncStore } from "@/stores/syncStore";
 import { createIdempotencyKey, generateUuid } from "@/utils/id";
 
 interface NewOfflineAction {
@@ -24,6 +25,8 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
   loadPending: async () => {
     set({ isBusy: true });
     const pending = await db.offlineActions.where("syncStatus").equals("pending").toArray();
+    useSyncStore.getState().setPendingCount(pending.length);
+    useSyncStore.getState().setPendingSize(pending.length * 0.1);
     set({ pendingActions: pending, isBusy: false });
   },
   enqueue: async ({ entity, action, payload, idempotencyKey }) => {
@@ -40,6 +43,9 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
     };
 
     await db.offlineActions.put(record);
+    const pendingCount = await db.offlineActions.where("syncStatus").equals("pending").count();
+    useSyncStore.getState().setPendingCount(pendingCount);
+    useSyncStore.getState().setPendingSize(pendingCount * 0.1);
     set({ pendingActions: [record, ...get().pendingActions] });
     return id;
   },
@@ -59,6 +65,8 @@ export const useOfflineQueueStore = create<OfflineQueueState>((set, get) => ({
   },
   clearAll: async () => {
     await db.offlineActions.clear();
+    useSyncStore.getState().setPendingCount(0);
+    useSyncStore.getState().setPendingSize(0);
     set({ pendingActions: [] });
   }
 }));

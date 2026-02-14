@@ -30,6 +30,16 @@ async function postBatch(): Promise<SyncBatchResponse> {
 }
 
 /**
+ * Recomputes queue metrics from IndexedDB so UI reflects pending work while offline.
+ */
+export async function refreshSyncQueueMetrics(): Promise<void> {
+  const syncStore = useSyncStore.getState();
+  const pending = await db.offlineActions.where("syncStatus").equals("pending").toArray();
+  syncStore.setPendingCount(pending.length);
+  syncStore.setPendingSize(pending.length * 0.1);
+}
+
+/**
  * Attempts one sync cycle for queued actions.
  */
 export async function syncPendingActions(): Promise<number> {
@@ -37,8 +47,7 @@ export async function syncPendingActions(): Promise<number> {
   syncStore.setSyncStatus("syncing");
 
   const pending = await db.offlineActions.where("syncStatus").equals("pending").toArray();
-  syncStore.setPendingCount(pending.length);
-  syncStore.setPendingSize(pending.length * 0.1);
+  await refreshSyncQueueMetrics();
 
   if (pending.length === 0) {
     syncStore.setSyncStatus("online");
@@ -66,13 +75,13 @@ export async function syncPendingActions(): Promise<number> {
     }
 
     const remaining = await db.offlineActions.where("syncStatus").equals("pending").count();
-    syncStore.setPendingCount(remaining);
-    syncStore.setPendingSize(remaining * 0.1);
+    await refreshSyncQueueMetrics();
     syncStore.setSyncStatus(remaining === 0 ? "online" : "error");
     syncStore.setLastSync(new Date());
     return result.syncedIds.length;
   } catch {
     syncStore.setSyncStatus("error");
+    await refreshSyncQueueMetrics();
     throw new Error("Failed to sync offline queue");
   }
 }
