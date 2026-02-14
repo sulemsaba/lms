@@ -35,3 +35,9 @@ Ignore `frontend/apps/student-hub/` for daily development. That folder is an old
 - Zustand stores for auth, sync, queue, and venues (`src/stores`)
 - Design tokens and global styles (`src/styles`)
 - Component system with CSS Modules (`src/components`)
+
+## New useful modules
+
+- Tasks board (`/tasks`) for personal planning with local persistence
+- Notifications center (`/notifications`) with read/unread control
+- Queue manager (`/queue-manager`) for manual sync, retry, and failed-item cleanup
