@@ -2,32 +2,39 @@ import { useEffect, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import SkeletonLoader from "@/components/ui/SkeletonLoader";
+import { fetchCourses, type CourseListItem } from "@/services/api/coursesApi";
 import styles from "./CoursesPage.module.css";
-
-interface Course {
-  id: string;
-  title: string;
-  lecturer: string;
-  cached: boolean;
-}
-
-const mockCourses: Course[] = [
-  { id: "c1", title: "Data Structures", lecturer: "Dr. Mushi", cached: true },
-  { id: "c2", title: "Machine Learning", lecturer: "Prof. Amani", cached: false },
-  { id: "c3", title: "Database Systems", lecturer: "Dr. Zawadi", cached: true }
-];
 
 /**
  * Course list with cache visibility for offline usage.
  */
 export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState<CourseListItem[]>([]);
+  const [sourceLabel, setSourceLabel] = useState("");
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
+    let mounted = true;
+    const load = async () => {
+      const result = await fetchCourses();
+      if (!mounted) {
+        return;
+      }
+      setCourses(result.courses);
+      if (result.source === "cache") {
+        setSourceLabel("Showing cached courses (offline mode).");
+      } else if (result.source === "fallback") {
+        setSourceLabel("Showing built-in sample courses. Connect once to cache real course data.");
+      } else {
+        setSourceLabel("");
+      }
       setLoading(false);
-    }, 450);
-    return () => window.clearTimeout(timer);
+    };
+
+    void load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) {
@@ -36,7 +43,8 @@ export default function CoursesPage() {
 
   return (
     <div className={styles.grid}>
-      {mockCourses.map((course) => (
+      {sourceLabel ? <p className={styles.hint}>{sourceLabel}</p> : null}
+      {courses.map((course) => (
         <Card key={course.id}>
           <div className={styles.row}>
             <div>

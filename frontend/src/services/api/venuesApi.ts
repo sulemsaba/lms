@@ -1,8 +1,9 @@
 import { apiClient } from "@/services/api/client";
-import type { CachedVenue } from "@/services/db";
+import { db, type CachedVenue } from "@/services/db";
 
-interface VenueApiResponse {
+export interface VenueFetchResult {
   venues: CachedVenue[];
+  source: "network" | "cache" | "fallback";
 }
 
 const fallbackVenues: CachedVenue[] = [
@@ -11,11 +12,22 @@ const fallbackVenues: CachedVenue[] = [
   { id: "v3", name: "UDBS Auditorium", campus: "Mlimani", gps: [-6.7722, 39.2388] }
 ];
 
-export async function fetchVenues(): Promise<CachedVenue[]> {
+/**
+ * Loads venues with network-first strategy and IndexedDB cache fallback.
+ */
+export async function fetchVenues(): Promise<VenueFetchResult> {
   try {
-    const response = await apiClient.get<VenueApiResponse>("/venues");
-    return response.data.venues;
+    const response = await apiClient.get<CachedVenue[] | { venues?: CachedVenue[] }>("/venues");
+    const venues = Array.isArray(response.data) ? response.data : response.data.venues ?? [];
+    if (venues.length > 0) {
+      await db.venues.bulkPut(venues);
+    }
+    return { venues, source: "network" };
   } catch {
-    return fallbackVenues;
+    const cachedVenues = await db.venues.toArray();
+    if (cachedVenues.length > 0) {
+      return { venues: cachedVenues, source: "cache" };
+    }
+    return { venues: fallbackVenues, source: "fallback" };
   }
 }

@@ -12,6 +12,7 @@ import styles from "./MapPage.module.css";
 export default function MapPage() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sourceLabel, setSourceLabel] = useState("");
   const filteredVenues = useVenueStore((state) => state.filteredVenues);
   const setVenues = useVenueStore((state) => state.setVenues);
   const searchVenues = useVenueStore((state) => state.searchVenues);
@@ -19,11 +20,18 @@ export default function MapPage() {
   useEffect(() => {
     let mounted = true;
     const load = async () => {
-      const venues = await fetchVenues();
+      const result = await fetchVenues();
       if (!mounted) {
         return;
       }
-      setVenues(venues);
+      setVenues(result.venues);
+      if (result.source === "cache") {
+        setSourceLabel("Showing cached venues (offline mode).");
+      } else if (result.source === "fallback") {
+        setSourceLabel("Showing built-in map data. Connect once to cache real venues.");
+      } else {
+        setSourceLabel("");
+      }
       setLoading(false);
     };
     void load();
@@ -53,6 +61,7 @@ export default function MapPage() {
           aria-label="Search venue"
         />
       </div>
+      {sourceLabel ? <p className={styles.hint}>{sourceLabel}</p> : null}
       <LeafletMap center={primaryVenue.gps} />
       <RouteDisplay
         steps={[
