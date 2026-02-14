@@ -24,6 +24,12 @@ Production implementation workspace for the UDSM LMS (COICT + UDBS + CoHU) pilot
    - `npm install`
    - `npm run dev`
 
+## Monorepo Commands (Run From Root)
+
+- `npm run test`: runs backend tests and frontend test command
+- `npm run build`: runs frontend production build
+- `npm run frontend:dev`: starts frontend dev server
+
 ## Notes
 
 - `lms.html` is retained only as a legacy prototype reference.
