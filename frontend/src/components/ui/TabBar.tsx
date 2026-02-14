@@ -17,6 +17,7 @@ export default function TabBar({ items }: TabBarProps) {
         <NavLink
           key={item.path}
           to={item.path}
+          end={item.path === "/"}
           className={({ isActive }) => `${styles.item} ${isActive ? styles.active : ""}`.trim()}
           aria-label={item.label}
         >

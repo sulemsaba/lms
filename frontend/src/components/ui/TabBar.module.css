@@ -1,10 +1,17 @@
 .tabBar {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
   gap: var(--spacing-xs);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
 }
 
 .item {
+  flex: 0 0 72px;
   min-height: var(--touch-target-min);
   display: flex;
   flex-direction: column;

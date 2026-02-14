@@ -6,6 +6,8 @@ const items: TabItem[] = [
   { label: "Home", icon: "home", path: "/" },
   { label: "Courses", icon: "menu_book", path: "/courses" },
   { label: "Assess", icon: "assignment", path: "/assessments" },
+  { label: "Timetable", icon: "calendar_month", path: "/timetable" },
+  { label: "Helpdesk", icon: "support_agent", path: "/helpdesk" },
   { label: "Map", icon: "map", path: "/map" },
   { label: "Profile", icon: "person", path: "/profile" }
 ];
