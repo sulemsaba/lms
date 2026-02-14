@@ -16,6 +16,12 @@ Ignore `frontend/apps/student-hub/` for daily development. That folder is an old
 2. `npm run dev`
 3. Open `http://127.0.0.1:5174/`
 
+## Role-aware login
+
+- The app now routes by RBAC role after sign-in (student, teaching, admin, guest).
+- Provide institution UUID in login or set `VITE_INSTITUTION_ID` in your frontend environment.
+- If backend auth is unavailable, use "Continue In Demo Mode" to preview role-specific UI.
+
 ## Build
 
 - `npm run build`

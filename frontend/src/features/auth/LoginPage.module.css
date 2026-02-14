@@ -1,0 +1,33 @@
+.stack {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.field {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.field > span {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.field input,
+.field select {
+  min-height: var(--touch-target-min);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: 0 var(--spacing-sm);
+  background: #fff;
+}
+
+.actions {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.feedback {
+  margin: 0;
+  color: var(--color-warning);
+}
