@@ -1,0 +1,13 @@
+{
+  "name": "lms",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:test": "npm --prefix frontend run test",
+    "backend:test": "python -m pytest backend/app/tests -q",
+    "test": "npm run backend:test && npm run frontend:test",
+    "build": "npm run frontend:build"
+  }
+}
