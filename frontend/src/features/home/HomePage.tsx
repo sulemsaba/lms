@@ -10,6 +10,9 @@ const moduleLinks = [
   { label: "Assessments", path: "/assessments" },
   { label: "Timetable", path: "/timetable" },
   { label: "Helpdesk", path: "/helpdesk" },
+  { label: "Tasks", path: "/tasks" },
+  { label: "Notifications", path: "/notifications" },
+  { label: "Queue Manager", path: "/queue-manager" },
   { label: "Map", path: "/map" },
   { label: "Profile", path: "/profile" }
 ];

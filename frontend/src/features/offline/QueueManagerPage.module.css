@@ -1,0 +1,42 @@
+.stack {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.message {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.itemHeader h3 {
+  margin: 0;
+}
+
+.meta {
+  margin: var(--spacing-xs) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.payload {
+  margin: 0;
+  background: #f6f8fa;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  overflow-x: auto;
+  font-size: var(--font-size-sm);
+}

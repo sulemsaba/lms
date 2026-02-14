@@ -11,6 +11,9 @@ import HelpdeskPage from "@/features/helpdesk/HelpdeskPage";
 import LoginPage from "@/features/auth/LoginPage";
 import OfflinePinPage from "@/features/auth/OfflinePinPage";
 import RbacMatrixPage from "@/features/admin/RbacMatrixPage";
+import TasksPage from "@/features/tasks/TasksPage";
+import NotificationsPage from "@/features/notifications/NotificationsPage";
+import QueueManagerPage from "@/features/offline/QueueManagerPage";
 import RequireAuth from "@/features/auth/RequireAuth";
 import RedirectIfAuthenticated from "@/features/auth/RedirectIfAuthenticated";
 import RequireAdmin from "@/features/auth/RequireAdmin";
@@ -31,6 +34,9 @@ export const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage /> },
       { path: "timetable", element: <TimetablePage /> },
       { path: "helpdesk", element: <HelpdeskPage /> },
+      { path: "tasks", element: <TasksPage /> },
+      { path: "notifications", element: <NotificationsPage /> },
+      { path: "queue-manager", element: <QueueManagerPage /> },
       {
         path: "rbac-matrix",
         element: (
