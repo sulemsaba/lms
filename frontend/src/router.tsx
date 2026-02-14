@@ -11,11 +11,18 @@ import HelpdeskPage from "@/features/helpdesk/HelpdeskPage";
 import LoginPage from "@/features/auth/LoginPage";
 import OfflinePinPage from "@/features/auth/OfflinePinPage";
 import RbacMatrixPage from "@/features/admin/RbacMatrixPage";
+import RequireAuth from "@/features/auth/RequireAuth";
+import RedirectIfAuthenticated from "@/features/auth/RedirectIfAuthenticated";
+import RequireAdmin from "@/features/auth/RequireAdmin";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppShell />,
+    element: (
+      <RequireAuth>
+        <AppShell />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <HomePage /> },
       { path: "courses", element: <CoursesPage /> },
@@ -24,10 +31,24 @@ export const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage /> },
       { path: "timetable", element: <TimetablePage /> },
       { path: "helpdesk", element: <HelpdeskPage /> },
-      { path: "rbac-matrix", element: <RbacMatrixPage /> },
+      {
+        path: "rbac-matrix",
+        element: (
+          <RequireAdmin>
+            <RbacMatrixPage />
+          </RequireAdmin>
+        )
+      },
       { path: "receipts/:id", element: <ReceiptDetailPage /> }
     ]
   },
-  { path: "/login", element: <LoginPage /> },
+  {
+    path: "/login",
+    element: (
+      <RedirectIfAuthenticated>
+        <LoginPage />
+      </RedirectIfAuthenticated>
+    )
+  },
   { path: "/offline-pin", element: <OfflinePinPage /> }
 ]);

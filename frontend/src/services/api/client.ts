@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { createIdempotencyKey } from "@/utils/id";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? "https://api.hub.udsm.ac.tz";
+const envInstitutionId = import.meta.env.VITE_INSTITUTION_ID as string | undefined;
 
 export const apiClient = axios.create({
   baseURL,
@@ -25,6 +26,11 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
   if (authState.accessToken) {
     next.headers.set("Authorization", `Bearer ${authState.accessToken}`);
+  }
+
+  const institutionId = authState.institutionId ?? envInstitutionId;
+  if (institutionId && !next.headers.get("x-institution-id")) {
+    next.headers.set("x-institution-id", institutionId);
   }
 
   const method = next.method?.toLowerCase();
