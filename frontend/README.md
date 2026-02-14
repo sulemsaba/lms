@@ -21,6 +21,7 @@ Ignore `frontend/apps/student-hub/` for daily development. That folder is an old
 - The app now routes by RBAC role after sign-in (student, teaching, admin, guest).
 - Provide institution UUID in login or set `VITE_INSTITUTION_ID` in your frontend environment.
 - If backend auth is unavailable, use "Continue In Demo Mode" to preview role-specific UI.
+- Super-admins can use Profile -> Role Switcher to impersonate another role without logging out.
 
 ## Build
 
