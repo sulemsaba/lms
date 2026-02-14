@@ -15,6 +15,10 @@ export default function App() {
         <p>Offline-first LMS shell initialized</p>
       </header>
 
+      <section className="offline-banner" aria-live="polite">
+        Legacy prototype view. Run <strong>frontend</strong> app for full UI: <code>cd frontend && npm run dev</code>
+      </section>
+
       {isOffline && (
         <section className="offline-banner" aria-live="polite">
           You are offline. Changes are saved and will sync when connected.
@@ -44,6 +48,8 @@ export default function App() {
         <button type="button">Home</button>
         <button type="button">Courses</button>
         <button type="button">Assessments</button>
+        <button type="button">Timetable</button>
+        <button type="button">Helpdesk</button>
         <button type="button">Map</button>
         <button type="button">Profile</button>
       </nav>
