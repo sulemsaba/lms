@@ -16,6 +16,20 @@ const STUDENT_ROLES = new Set(["student"]);
 
 const GUEST_ROLES = new Set(["guest"]);
 
+export const IMPERSONATION_ROLE_CODES = [
+  "student",
+  "lecturer",
+  "ta",
+  "external_examiner",
+  "dept_admin",
+  "hod",
+  "college_exam_officer",
+  "college_admin",
+  "exam_officer",
+  "ict_admin",
+  "guest"
+] as const;
+
 function hasAnyRole(roleCodes: string[], expected: Set<string>): boolean {
   return roleCodes.some((roleCode) => expected.has(roleCode));
 }
@@ -61,6 +75,10 @@ export function formatRoleLabel(roleCode: string): string {
 
 export function canAccessAdminArea(roleCodes: string[], permissions: string[]): boolean {
   return hasAnyRole(roleCodes, ADMIN_ROLES) || permissions.includes("system.users_roles.manage");
+}
+
+export function canSuperAdminImpersonate(roleCodes: string[]): boolean {
+  return roleCodes.includes("super_admin");
 }
 
 export function getLandingPath(roleCodes: string[], permissions: string[]): string {

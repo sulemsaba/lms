@@ -33,6 +33,13 @@ export interface CurrentAuthzResponse {
   permissions: string[];
 }
 
+export interface RoleMatrixItem {
+  role_code: string;
+  description: string;
+  scope_type: string;
+  permissions: string[];
+}
+
 export async function loginWithPassword(payload: LoginPayload): Promise<TokenPair> {
   const body: LoginRequestBody = {
     email: payload.email,
@@ -47,6 +54,13 @@ export async function loginWithPassword(payload: LoginPayload): Promise<TokenPai
 
 export async function fetchMyAuthorization(institutionId: string): Promise<CurrentAuthzResponse> {
   const response = await apiClient.get<CurrentAuthzResponse>("/rbac/me", {
+    headers: { "x-institution-id": institutionId }
+  });
+  return response.data;
+}
+
+export async function fetchRoleMatrix(institutionId: string): Promise<RoleMatrixItem[]> {
+  const response = await apiClient.get<RoleMatrixItem[]>("/rbac/matrix", {
     headers: { "x-institution-id": institutionId }
   });
   return response.data;
