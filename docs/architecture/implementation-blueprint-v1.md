@@ -16,4 +16,4 @@ This repository follows the locked UDSM LMS Implementation Blueprint v1.0.
 
 ## Replacement rule
 
-The legacy file `lms.html` is superseded by the app under `frontend/apps/student-hub`.
+The legacy file `lms.html` is superseded by the active app under `frontend/src` (run from `frontend/`).
