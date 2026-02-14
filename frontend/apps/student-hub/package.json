@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node -e \"console.error('ERROR: frontend/apps/student-hub is deprecated and dev startup is disabled. Use: cd frontend && npm run dev'); process.exit(1)\"",
     "build": "vite build",
     "preview": "vite preview"
   },
