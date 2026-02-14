@@ -3,6 +3,8 @@ import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import OfflineBanner from "@/components/offline/OfflineBanner";
 import SyncHealthCard from "@/components/offline/SyncHealthCard";
+import { getPortalSubtitle, getPortalTitle } from "@/features/auth/roleAccess";
+import { useAuthStore } from "@/stores/authStore";
 import { useSyncStore } from "@/stores/syncStore";
 import styles from "./AppShell.module.css";
 
@@ -15,12 +17,16 @@ export default function AppShell() {
   const pendingCount = useSyncStore((state) => state.pendingCount);
   const pendingSize = useSyncStore((state) => state.pendingSize);
   const syncStatus = useSyncStore((state) => state.syncStatus);
+  const roleCodes = useAuthStore((state) => state.roleCodes);
+  const permissions = useAuthStore((state) => state.permissions);
 
   const showOfflineBanner = syncStatus === "offline" || syncStatus === "error";
+  const portalTitle = getPortalTitle(roleCodes, permissions);
+  const portalSubtitle = getPortalSubtitle(roleCodes, permissions);
 
   return (
     <div className={styles.shell}>
-      <Header title="UDSM Student Hub" subtitle="Offline-first learning and campus life" />
+      <Header title={portalTitle} subtitle={portalSubtitle} />
       <main className={styles.content}>
         {showOfflineBanner ? <OfflineBanner lastSync={lastSync ?? undefined} /> : null}
         {pathname === "/" ? (
