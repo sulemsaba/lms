@@ -41,26 +41,28 @@ export default function AppShell() {
 
   return (
     <div className={styles.shell}>
-      <Header title={portalTitle} subtitle={portalSubtitle} />
-      <main className={styles.content}>
-        {impersonatedRoleCode ? (
-          <div className={styles.impersonationBanner}>
-            <p>
-              Impersonating <strong>{formatRoleLabel(impersonatedRoleCode)}</strong>. API session remains your original
-              super-admin account.
-            </p>
-            <Button variant="text" onClick={onStopImpersonation}>
-              End Impersonation
-            </Button>
-          </div>
-        ) : null}
-        {showOfflineBanner ? <OfflineBanner lastSync={lastSync ?? undefined} /> : null}
-        {pathname === "/" ? (
-          <SyncHealthCard lastSync={lastSync} pendingCount={pendingCount} pendingSize={pendingSize} />
-        ) : null}
-        <Outlet />
-      </main>
       <BottomNav />
+      <div className={styles.mainPanel}>
+        <Header title={portalTitle} subtitle={portalSubtitle} />
+        <main className={styles.content}>
+          {impersonatedRoleCode ? (
+            <div className={styles.impersonationBanner}>
+              <p>
+                Impersonating <strong>{formatRoleLabel(impersonatedRoleCode)}</strong>. API session remains your original
+                super-admin account.
+              </p>
+              <Button variant="text" onClick={onStopImpersonation}>
+                End Impersonation
+              </Button>
+            </div>
+          ) : null}
+          {showOfflineBanner ? <OfflineBanner lastSync={lastSync ?? undefined} /> : null}
+          {pathname === "/" ? (
+            <SyncHealthCard lastSync={lastSync} pendingCount={pendingCount} pendingSize={pendingSize} />
+          ) : null}
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
