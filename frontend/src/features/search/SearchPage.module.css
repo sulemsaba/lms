@@ -16,7 +16,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-sm);
-  background: #fff;
+  background: var(--color-elevated);
 }
 
 .sectionHeader {
@@ -39,7 +39,7 @@
 .resultItem {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
-  background: #fff;
+  background: var(--color-elevated);
   padding: var(--spacing-sm);
   display: grid;
   gap: 2px;

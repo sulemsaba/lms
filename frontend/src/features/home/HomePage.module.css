@@ -16,7 +16,7 @@
 .snapshotItem {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
-  background: #fff;
+  background: var(--color-elevated);
   min-height: var(--touch-target-min);
   padding: var(--spacing-sm);
   display: grid;
@@ -43,7 +43,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-sm);
-  background: #fff;
+  background: var(--color-elevated);
   display: flex;
   align-items: center;
   justify-content: center;

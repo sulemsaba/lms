@@ -13,6 +13,7 @@
   --color-border: #e0e0e0;
   --color-background: #ffffff;
   --color-surface: #f5ffff;
+  --color-elevated: #ffffff;
 
   /* Typography */
   --font-family: "Roboto", system-ui, sans-serif;
@@ -41,4 +42,23 @@
 
   /* Touch targets */
   --touch-target-min: 48px;
+}
+
+:root[data-theme="dark"] {
+  --color-primary: #4fc3f7;
+  --color-secondary: #1e2a33;
+  --color-success: #52c97a;
+  --color-accent: #8f85ff;
+  --color-warning: #ffb74d;
+  --color-error: #ff8a80;
+
+  --color-text-primary: #f3f6fa;
+  --color-text-secondary: #b5c0cc;
+  --color-border: #314050;
+  --color-background: #101820;
+  --color-surface: #152430;
+  --color-elevated: #1b2d3b;
+
+  --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-elevation-2: 0 3px 8px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(0, 0, 0, 0.35);
 }
