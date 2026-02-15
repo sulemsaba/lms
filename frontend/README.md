@@ -38,6 +38,8 @@ Ignore `frontend/apps/student-hub/` for daily development. That folder is an old
 
 ## New useful modules
 
+- Side navigation rail replacing bottom tabs for faster multi-module access
+- Theme toggle (light/dark) persisted in browser storage
 - Tasks board (`/tasks`) for personal planning with local persistence
 - Study notes (`/notes`) for offline note-taking with pin/search support
 - Notifications center (`/notifications`) with read/unread control

@@ -14,7 +14,7 @@ import { useSyncStore } from "@/stores/syncStore";
 import styles from "./AppShell.module.css";
 
 /**
- * Global page frame containing header, offline state, and bottom navigation.
+ * Global page frame containing header, offline state, and side navigation.
  */
 export default function AppShell() {
   const navigate = useNavigate();
