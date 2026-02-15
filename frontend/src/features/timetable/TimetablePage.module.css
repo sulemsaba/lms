@@ -7,7 +7,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-md);
-  background: #fff;
+  background: var(--color-elevated);
 }
 
 .hint {

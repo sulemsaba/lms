@@ -19,7 +19,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   padding: 0 var(--spacing-sm);
-  background: #fff;
+  background: var(--color-elevated);
 }
 
 .actions {

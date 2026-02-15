@@ -33,7 +33,7 @@
 
 .payload {
   margin: 0;
-  background: #f6f8fa;
+  background: color-mix(in srgb, var(--color-elevated) 70%, var(--color-background));
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-sm);
