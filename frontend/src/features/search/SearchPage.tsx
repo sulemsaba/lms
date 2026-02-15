@@ -179,7 +179,7 @@ export default function SearchPage() {
             .map((item) => ({
               id: `event-${item.id}`,
               title: item.title,
-              subtitle: `${item.courseLabel} • ${item.venueLabel}`,
+              subtitle: `${item.courseLabel} - ${item.venueLabel}`,
               path: "/timetable"
             }))
         ),
