@@ -1,12 +1,16 @@
 .tabBar {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
   gap: var(--spacing-xs);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 .item {
+  flex: 0 0 auto;
+  min-width: 72px;
   min-height: var(--touch-target-min);
-  padding: 2px;
+  padding: 2px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;

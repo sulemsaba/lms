@@ -169,6 +169,13 @@ export function buildNavItems(roleCodes: string[], permissions: string[]): TabIt
     addUnique(items, { label: "Helpdesk", icon: "support_agent", path: "/helpdesk" });
   }
 
+  if (experience !== "guest") {
+    addUnique(items, { label: "Tasks", icon: "checklist", path: "/tasks" });
+    addUnique(items, { label: "Notes", icon: "edit_note", path: "/notes" });
+    addUnique(items, { label: "Alerts", icon: "notifications", path: "/notifications" });
+    addUnique(items, { label: "Queue", icon: "sync", path: "/queue-manager" });
+  }
+
   addUnique(items, { label: "Map", icon: "map", path: "/map" });
 
   if (canAccessAdminArea(roleCodes, permissions)) {

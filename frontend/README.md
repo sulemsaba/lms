@@ -39,5 +39,7 @@ Ignore `frontend/apps/student-hub/` for daily development. That folder is an old
 ## New useful modules
 
 - Tasks board (`/tasks`) for personal planning with local persistence
+- Study notes (`/notes`) for offline note-taking with pin/search support
 - Notifications center (`/notifications`) with read/unread control
 - Queue manager (`/queue-manager`) for manual sync, retry, and failed-item cleanup
+- Activity snapshot on Home (open tasks, unread alerts, note count)

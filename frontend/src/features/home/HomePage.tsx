@@ -48,8 +48,8 @@ export default function HomePage() {
     let mounted = true;
     const loadSnapshot = async () => {
       const [openTasks, unreadNotifications, notes] = await Promise.all([
-        db.tasks.where("completed").equals(false).count(),
-        db.notifications.where("read").equals(false).count(),
+        db.tasks.where("completed").equals(0).count(),
+        db.notifications.where("read").equals(0).count(),
         db.notes.count()
       ]);
       if (!mounted) {
