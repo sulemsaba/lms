@@ -14,6 +14,7 @@ import RbacMatrixPage from "@/features/admin/RbacMatrixPage";
 import TasksPage from "@/features/tasks/TasksPage";
 import NotificationsPage from "@/features/notifications/NotificationsPage";
 import QueueManagerPage from "@/features/offline/QueueManagerPage";
+import NotesPage from "@/features/notes/NotesPage";
 import RequireAuth from "@/features/auth/RequireAuth";
 import RedirectIfAuthenticated from "@/features/auth/RedirectIfAuthenticated";
 import RequireAdmin from "@/features/auth/RequireAdmin";
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
       { path: "helpdesk", element: <HelpdeskPage /> },
       { path: "tasks", element: <TasksPage /> },
       { path: "notifications", element: <NotificationsPage /> },
+      { path: "notes", element: <NotesPage /> },
       { path: "queue-manager", element: <QueueManagerPage /> },
       {
         path: "rbac-matrix",

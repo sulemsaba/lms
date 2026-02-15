@@ -7,6 +7,31 @@
   color: var(--color-text-secondary);
 }
 
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.snapshotItem {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: #fff;
+  min-height: var(--touch-target-min);
+  padding: var(--spacing-sm);
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.snapshotItem strong {
+  font-size: var(--font-size-lg);
+}
+
+.snapshotItem span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
 .moduleGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));

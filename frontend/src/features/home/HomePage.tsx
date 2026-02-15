@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Card from "@/components/ui/Card";
 import SkeletonLoader from "@/components/ui/SkeletonLoader";
+import { db } from "@/services/db";
 import { useSyncStore } from "@/stores/syncStore";
 import styles from "./HomePage.module.css";
 
@@ -11,17 +12,29 @@ const moduleLinks = [
   { label: "Timetable", path: "/timetable" },
   { label: "Helpdesk", path: "/helpdesk" },
   { label: "Tasks", path: "/tasks" },
+  { label: "Notes", path: "/notes" },
   { label: "Notifications", path: "/notifications" },
   { label: "Queue Manager", path: "/queue-manager" },
   { label: "Map", path: "/map" },
   { label: "Profile", path: "/profile" }
 ];
 
+interface SnapshotState {
+  openTasks: number;
+  unreadNotifications: number;
+  notes: number;
+}
+
 /**
  * Home dashboard with schedule and offline-aware state.
  */
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
+  const [snapshot, setSnapshot] = useState<SnapshotState>({
+    openTasks: 0,
+    unreadNotifications: 0,
+    notes: 0
+  });
   const syncStatus = useSyncStore((state) => state.syncStatus);
 
   useEffect(() => {
@@ -29,6 +42,36 @@ export default function HomePage() {
       setLoading(false);
     }, 350);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadSnapshot = async () => {
+      const [openTasks, unreadNotifications, notes] = await Promise.all([
+        db.tasks.where("completed").equals(false).count(),
+        db.notifications.where("read").equals(false).count(),
+        db.notes.count()
+      ]);
+      if (!mounted) {
+        return;
+      }
+      setSnapshot({
+        openTasks,
+        unreadNotifications,
+        notes
+      });
+    };
+
+    void loadSnapshot();
+    const onFocus = () => {
+      void loadSnapshot();
+    };
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   if (loading) {
@@ -46,6 +89,23 @@ export default function HomePage() {
         <h2>Upcoming Deadline</h2>
         <p>Algorithm Analysis Report due tomorrow at 23:59.</p>
         <p className={styles.muted}>Network status: {syncStatus}</p>
+      </Card>
+      <Card>
+        <h2>Activity Snapshot</h2>
+        <div className={styles.snapshotGrid}>
+          <Link to="/tasks" className={styles.snapshotItem}>
+            <strong>{snapshot.openTasks}</strong>
+            <span>Open Tasks</span>
+          </Link>
+          <Link to="/notifications" className={styles.snapshotItem}>
+            <strong>{snapshot.unreadNotifications}</strong>
+            <span>Unread Alerts</span>
+          </Link>
+          <Link to="/notes" className={styles.snapshotItem}>
+            <strong>{snapshot.notes}</strong>
+            <span>Saved Notes</span>
+          </Link>
+        </div>
       </Card>
       <Card>
         <h2>Explore Modules</h2>

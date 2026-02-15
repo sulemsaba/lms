@@ -59,6 +59,16 @@ export interface CachedNotification {
   createdAt: string;
 }
 
+export interface LocalNote {
+  id: string;
+  title: string;
+  content: string;
+  courseLabel: string;
+  pinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CachedResource {
   id: string;
   versionId: string;
@@ -75,6 +85,7 @@ export class AppDatabase extends Dexie {
   timetableEvents!: Table<CachedTimetableEvent, string>;
   tasks!: Table<LocalTask, string>;
   notifications!: Table<CachedNotification, string>;
+  notes!: Table<LocalNote, string>;
   resources!: Table<CachedResource, string>;
   receipts!: Table<CachedReceipt, string>;
 
@@ -101,6 +112,17 @@ export class AppDatabase extends Dexie {
       timetableEvents: "id, startsAt, eventType, updatedAt",
       tasks: "id, completed, priority, dueDate, updatedAt",
       notifications: "id, read, level, createdAt",
+      resources: "id, versionId",
+      receipts: "id, timestamp"
+    });
+    this.version(4).stores({
+      offlineActions: "id, syncStatus, createdAt",
+      venues: "id, campus",
+      courses: "id, code, status, updatedAt",
+      timetableEvents: "id, startsAt, eventType, updatedAt",
+      tasks: "id, completed, priority, dueDate, updatedAt",
+      notifications: "id, read, level, createdAt",
+      notes: "id, pinned, courseLabel, updatedAt",
       resources: "id, versionId",
       receipts: "id, timestamp"
     });
