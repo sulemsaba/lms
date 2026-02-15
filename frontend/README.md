@@ -42,4 +42,5 @@ Ignore `frontend/apps/student-hub/` for daily development. That folder is an old
 - Study notes (`/notes`) for offline note-taking with pin/search support
 - Notifications center (`/notifications`) with read/unread control
 - Queue manager (`/queue-manager`) for manual sync, retry, and failed-item cleanup
+- Global search (`/search`) across modules, courses, timetable, tasks, notes, notifications, and venues
 - Activity snapshot on Home (open tasks, unread alerts, note count)

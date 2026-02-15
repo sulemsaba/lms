@@ -140,6 +140,7 @@ export function buildNavItems(roleCodes: string[], permissions: string[]): TabIt
   const items: TabItem[] = [];
 
   addUnique(items, { label: "Home", icon: "home", path: "/" });
+  addUnique(items, { label: "Search", icon: "search", path: "/search" });
 
   const canSeeCourses = hasAnyPermission(permissions, ["course.read", "course.write"]) || experience !== "guest";
   if (canSeeCourses) {

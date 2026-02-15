@@ -9,6 +9,7 @@ import styles from "./HomePage.module.css";
 const moduleLinks = [
   { label: "Courses", path: "/courses" },
   { label: "Assessments", path: "/assessments" },
+  { label: "Search", path: "/search" },
   { label: "Timetable", path: "/timetable" },
   { label: "Helpdesk", path: "/helpdesk" },
   { label: "Tasks", path: "/tasks" },
