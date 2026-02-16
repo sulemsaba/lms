@@ -10,7 +10,6 @@ import {
 } from "@/services/sync/backgroundSync";
 import { useSyncStore } from "@/stores/syncStore";
 import { useThemeStore } from "@/stores/themeStore";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 
 /**
  * Root app component binding routing and offline sync wiring.
@@ -55,10 +54,5 @@ export default function App() {
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
 
-  return (
-    <>
-      <ThemeToggle />
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }

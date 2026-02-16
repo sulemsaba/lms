@@ -1,5 +1,6 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import BottomNav from "@/components/layout/BottomNav";
 import { buildStudentFeaturePaths } from "@/features/auth/roleAccess";
 import {
   selectEffectivePermissions,
@@ -7,17 +8,6 @@ import {
   useAuthStore
 } from "@/stores/authStore";
 import "./DashboardApp.css";
-
-interface NavItem {
-  label: string;
-  icon: string;
-  path: string;
-}
-
-interface NavSection {
-  title: string;
-  items: NavItem[];
-}
 
 interface StudentFeature {
   label: string;
@@ -31,48 +21,6 @@ interface CalendarDay {
   muted?: boolean;
   today?: boolean;
 }
-
-const NAV_SECTIONS: NavSection[] = [
-  {
-    title: "Dashboard",
-    items: [
-      { label: "Dashboard", icon: "dashboard", path: "/" },
-      { label: "Campus Map", icon: "map", path: "/map" },
-      { label: "Search", icon: "search", path: "/search" },
-      { label: "Profile", icon: "person", path: "/profile" }
-    ]
-  },
-  {
-    title: "Academics",
-    items: [
-      { label: "My Courses", icon: "menu_book", path: "/courses" },
-      { label: "Assessments", icon: "assignment", path: "/assessments" },
-      { label: "Assignments", icon: "assignment", path: "/assignments" },
-      { label: "Timetable", icon: "calendar_month", path: "/timetable" },
-      { label: "Results", icon: "account_balance", path: "/results" }
-    ]
-  },
-  {
-    title: "University",
-    items: [
-      { label: "Payments", icon: "receipt_long", path: "/payments" },
-      { label: "Community", icon: "forum", path: "/community" },
-      { label: "Helpdesk", icon: "support_agent", path: "/helpdesk" }
-    ]
-  },
-  {
-    title: "Productivity",
-    items: [
-      { label: "Tasks", icon: "checklist", path: "/tasks" },
-      { label: "Notes", icon: "edit_note", path: "/notes" },
-      { label: "Alerts", icon: "notifications", path: "/notifications" },
-      { label: "Queue Manager", icon: "sync", path: "/queue-manager" },
-      { label: "Focus Mode", icon: "timer", path: "/focus-mode" },
-      { label: "Resources", icon: "folder_open", path: "/resources" },
-      { label: "Study Groups", icon: "group", path: "/study-groups" }
-    ]
-  }
-];
 
 const STUDENT_FEATURES: StudentFeature[] = [
   { label: "Dashboard", icon: "dashboard", summary: "Overview and quick actions", path: "/" },
@@ -146,8 +94,6 @@ export default function DashboardApp() {
   const { pathname } = useLocation();
   const roleCodes = useAuthStore(selectEffectiveRoleCodes);
   const permissions = useAuthStore(selectEffectivePermissions);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [timerRunning, setTimerRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(FOCUS_DURATION_SECONDS);
   const timerRef = useRef<number | null>(null);
@@ -157,15 +103,6 @@ export default function DashboardApp() {
   const timerProgress = timeLeft / FOCUS_DURATION_SECONDS;
   const timerStrokeOffset = RING_CIRCUMFERENCE * (1 - timerProgress);
   const allowedPaths = useMemo(() => new Set(buildStudentFeaturePaths(roleCodes, permissions)), [permissions, roleCodes]);
-
-  const visibleNavSections = useMemo(
-    () =>
-      NAV_SECTIONS.map((section) => ({
-        ...section,
-        items: section.items.filter((item) => allowedPaths.has(item.path))
-      })).filter((section) => section.items.length > 0),
-    [allowedPaths]
-  );
 
   const visibleStudentFeatures = useMemo(
     () => STUDENT_FEATURES.filter((feature) => allowedPaths.has(feature.path)),
@@ -200,19 +137,8 @@ export default function DashboardApp() {
     };
   }, [timerRunning]);
 
-  const onSelectNav = (path: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    navigate(path);
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false);
-    }
-  };
-
   const onSelectFeature = (path: string) => {
     navigate(path);
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false);
-    }
   };
 
   const isPathActive = (path: string): boolean => {
@@ -224,64 +150,11 @@ export default function DashboardApp() {
 
   return (
     <div className="dashboard-root">
-      <aside
-        id="sidebar"
-        className={`${sidebarOpen ? "active" : ""} ${sidebarCollapsed ? "collapsed" : ""}`.trim()}
-      >
-        <div className="brand">
-          <div className="brand-icon">
-            <span className="material-symbols-rounded">school</span>
-          </div>
-          <div className="brand-text">UDSM Hub</div>
-          <button
-            type="button"
-            className="sidebar-shrink"
-            onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <span className="material-symbols-rounded">
-              {sidebarCollapsed ? "keyboard_double_arrow_right" : "keyboard_double_arrow_left"}
-            </span>
-          </button>
-        </div>
-
-        <ul className="nav-menu">
-          {visibleNavSections.map((section) => (
-            <Fragment key={section.title}>
-              <li className="nav-category">{section.title}</li>
-              {section.items.map((item) => (
-                <li className="nav-item" key={item.label}>
-                  <a
-                    href={item.path}
-                    className={`nav-link${isPathActive(item.path) ? " active" : ""}`}
-                    onClick={onSelectNav(item.path)}
-                    title={item.label}
-                  >
-                    <span className="material-symbols-rounded nav-icon">{item.icon}</span>
-                    <span className="nav-label">{item.label}</span>
-                  </a>
-                </li>
-              ))}
-            </Fragment>
-          ))}
-        </ul>
-
-        <div className="user-profile">
-          <div className="avatar" />
-          <div className="user-info">
-            <h4>Suleiman M.</h4>
-            <p>Computer Science</p>
-          </div>
-          <span className="material-symbols-rounded user-expand">expand_more</span>
-        </div>
-      </aside>
+      <BottomNav />
 
       <main>
         <header>
           <div className="header-left">
-            <button type="button" className="material-symbols-rounded menu-toggle" onClick={() => setSidebarOpen((open) => !open)}>
-              menu
-            </button>
             <div className="header-title">
               <h1>Dashboard</h1>
               <p>{currentDate}</p>
