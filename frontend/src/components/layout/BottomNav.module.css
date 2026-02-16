@@ -62,30 +62,6 @@
   border-color: transparent;
 }
 
-.footer {
-  margin-top: auto;
-}
-
-.themeToggle {
-  width: 100%;
-  min-height: 44px;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text-primary);
-  padding: 0 var(--spacing-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.themeToggle:hover {
-  border-color: var(--color-primary-light);
-}
-
 @media (max-width: 900px) {
   .container {
     position: static;
@@ -110,9 +86,5 @@
   .link {
     flex: 0 0 auto;
     white-space: nowrap;
-  }
-
-  .footer {
-    margin-top: 0;
   }
 }
