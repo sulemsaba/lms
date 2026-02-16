@@ -233,7 +233,7 @@ export default function DashboardApp() {
               <div className="stat-card red">
                 <span className="stat-label">Next Class</span>
                 <span className="stat-value">45m</span>
-                <span className="stat-sub">CS101 · Hall 4</span>
+                <span className="stat-sub">CS101 - Hall 4</span>
               </div>
             </div>
 
@@ -250,7 +250,7 @@ export default function DashboardApp() {
                   </div>
                   <div className="item-content">
                     <div className="item-title">CS101: Intro to Programming</div>
-                    <div className="item-sub">10:00 AM - 12:00 PM · Lecture Hall 1</div>
+                    <div className="item-sub">10:00 AM - 12:00 PM - Lecture Hall 1</div>
                   </div>
                   <span className="tag lecture">Lecture</span>
                 </div>
@@ -261,7 +261,7 @@ export default function DashboardApp() {
                   </div>
                   <div className="item-content">
                     <div className="item-title">MT200: Discrete Mathematics</div>
-                    <div className="item-sub">02:00 PM - 04:00 PM · Seminar Room 3</div>
+                    <div className="item-sub">02:00 PM - 04:00 PM - Seminar Room 3</div>
                   </div>
                   <span className="tag tutorial">Tutorial</span>
                 </div>
@@ -272,7 +272,7 @@ export default function DashboardApp() {
                   </div>
                   <div className="item-content">
                     <div className="item-title">Study Group: Algorithms</div>
-                    <div className="item-sub">05:00 PM · Library</div>
+                    <div className="item-sub">05:00 PM - Library</div>
                   </div>
                 </div>
               </div>
@@ -286,14 +286,14 @@ export default function DashboardApp() {
                     <span className="material-symbols-rounded resource-icon pdf">picture_as_pdf</span>
                     <div>
                       <div className="resource-title">Algebra_Notes.pdf</div>
-                      <div className="resource-meta">2.4 MB · Just now</div>
+                      <div className="resource-meta">2.4 MB - Just now</div>
                     </div>
                   </div>
                   <div className="resource-card">
                     <span className="material-symbols-rounded resource-icon doc">description</span>
                     <div>
                       <div className="resource-title">Project_Brief.docx</div>
-                      <div className="resource-meta">500 KB · 2 hrs ago</div>
+                      <div className="resource-meta">500 KB - 2 hrs ago</div>
                     </div>
                   </div>
                 </div>
