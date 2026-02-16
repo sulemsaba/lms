@@ -5,3 +5,24 @@
   border-radius: var(--border-radius-lg);
   overflow: hidden;
 }
+
+.mapNotice {
+  margin: 0;
+  color: var(--color-text-secondary);
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mapFallback {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: var(--color-elevated);
+}
+
+.mapFrame {
+  width: 100%;
+  height: 420px;
+  border: 0;
+}

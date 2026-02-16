@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { buildStudentFeaturePaths } from "@/features/auth/roleAccess";
+import {
+  selectEffectivePermissions,
+  selectEffectiveRoleCodes,
+  useAuthStore
+} from "@/stores/authStore";
 import "./DashboardApp.css";
 
 interface NavItem {
@@ -138,6 +144,8 @@ const formatFocusClock = (seconds: number): string => {
 export default function DashboardApp() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const roleCodes = useAuthStore(selectEffectiveRoleCodes);
+  const permissions = useAuthStore(selectEffectivePermissions);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -148,6 +156,21 @@ export default function DashboardApp() {
   const timerText = useMemo(() => formatFocusClock(timeLeft), [timeLeft]);
   const timerProgress = timeLeft / FOCUS_DURATION_SECONDS;
   const timerStrokeOffset = RING_CIRCUMFERENCE * (1 - timerProgress);
+  const allowedPaths = useMemo(() => new Set(buildStudentFeaturePaths(roleCodes, permissions)), [permissions, roleCodes]);
+
+  const visibleNavSections = useMemo(
+    () =>
+      NAV_SECTIONS.map((section) => ({
+        ...section,
+        items: section.items.filter((item) => allowedPaths.has(item.path))
+      })).filter((section) => section.items.length > 0),
+    [allowedPaths]
+  );
+
+  const visibleStudentFeatures = useMemo(
+    () => STUDENT_FEATURES.filter((feature) => allowedPaths.has(feature.path)),
+    [allowedPaths]
+  );
 
   useEffect(() => {
     if (!timerRunning) {
@@ -223,7 +246,7 @@ export default function DashboardApp() {
         </div>
 
         <ul className="nav-menu">
-          {NAV_SECTIONS.map((section) => (
+          {visibleNavSections.map((section) => (
             <Fragment key={section.title}>
               <li className="nav-category">{section.title}</li>
               {section.items.map((item) => (
@@ -323,10 +346,10 @@ export default function DashboardApp() {
             <div className="card student-features">
               <div className="card-header">
                 <h3 className="card-title">All Student Features</h3>
-                <span className="card-action">{STUDENT_FEATURES.length} Modules</span>
+                <span className="card-action">{visibleStudentFeatures.length} Modules</span>
               </div>
               <div className="feature-grid">
-                {STUDENT_FEATURES.map((feature) => (
+                {visibleStudentFeatures.map((feature) => (
                   <button
                     key={feature.label}
                     type="button"

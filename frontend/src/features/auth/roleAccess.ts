@@ -187,3 +187,24 @@ export function buildNavItems(roleCodes: string[], permissions: string[]): TabIt
 
   return items;
 }
+
+export function buildStudentFeaturePaths(roleCodes: string[], permissions: string[]): string[] {
+  const allowed = new Set(buildNavItems(roleCodes, permissions).map((item) => item.path));
+  const canSeeAssignments = allowed.has("/assessments");
+  const canSeeExtendedStudentModules = allowed.has("/tasks");
+
+  if (canSeeAssignments) {
+    allowed.add("/assignments");
+  }
+
+  if (canSeeExtendedStudentModules) {
+    allowed.add("/results");
+    allowed.add("/payments");
+    allowed.add("/community");
+    allowed.add("/focus-mode");
+    allowed.add("/resources");
+    allowed.add("/study-groups");
+  }
+
+  return Array.from(allowed);
+}
