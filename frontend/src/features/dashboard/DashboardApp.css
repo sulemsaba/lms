@@ -51,11 +51,41 @@
   z-index: 50;
 }
 
+.dashboard-root aside.collapsed {
+  width: 96px;
+}
+
 .dashboard-root .brand {
   padding: 32px 24px;
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.dashboard-root .sidebar-shrink {
+  margin-left: auto;
+  width: 30px;
+  height: 30px;
+  min-width: 0;
+  min-height: 0;
+  border: none;
+  background: var(--bg-body);
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.dashboard-root .sidebar-shrink:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.dashboard-root .sidebar-shrink .material-symbols-rounded {
+  font-size: 18px;
 }
 
 .dashboard-root .brand-icon {
@@ -109,6 +139,10 @@
   transition: all 0.2s;
 }
 
+.dashboard-root .nav-label {
+  white-space: nowrap;
+}
+
 .dashboard-root .nav-link:hover {
   background: var(--bg-body);
   color: var(--primary);
@@ -155,6 +189,47 @@
 .dashboard-root .user-expand {
   color: var(--text-muted);
   margin-left: auto;
+}
+
+.dashboard-root aside.collapsed .brand {
+  flex-direction: column;
+  padding: 20px 12px;
+}
+
+.dashboard-root aside.collapsed .brand-text {
+  display: none;
+}
+
+.dashboard-root aside.collapsed .sidebar-shrink {
+  margin-left: 0;
+}
+
+.dashboard-root aside.collapsed .nav-category {
+  margin: 16px 8px 12px;
+  border-top: 1px solid var(--border);
+  color: transparent;
+  font-size: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.dashboard-root aside.collapsed .nav-link {
+  justify-content: center;
+  padding: 12px;
+}
+
+.dashboard-root aside.collapsed .nav-label {
+  display: none;
+}
+
+.dashboard-root aside.collapsed .user-profile {
+  justify-content: center;
+  padding: 12px;
+}
+
+.dashboard-root aside.collapsed .user-info,
+.dashboard-root aside.collapsed .user-expand {
+  display: none;
 }
 
 .dashboard-root main {
@@ -753,6 +828,50 @@
 
   .dashboard-root aside.active {
     left: 0;
+  }
+
+  .dashboard-root aside.collapsed {
+    width: 280px;
+  }
+
+  .dashboard-root aside.collapsed .brand {
+    flex-direction: row;
+    padding: 32px 24px;
+  }
+
+  .dashboard-root aside.collapsed .brand-text {
+    display: block;
+  }
+
+  .dashboard-root aside.collapsed .nav-category {
+    border-top: none;
+    color: var(--text-muted);
+    font-size: 11px;
+    margin: 24px 0 12px 12px;
+    height: auto;
+  }
+
+  .dashboard-root aside.collapsed .nav-link {
+    justify-content: flex-start;
+    padding: 12px 16px;
+  }
+
+  .dashboard-root aside.collapsed .nav-label {
+    display: inline;
+  }
+
+  .dashboard-root aside.collapsed .user-profile {
+    justify-content: flex-start;
+    padding: 16px;
+  }
+
+  .dashboard-root aside.collapsed .user-info,
+  .dashboard-root aside.collapsed .user-expand {
+    display: block;
+  }
+
+  .dashboard-root .sidebar-shrink {
+    display: none;
   }
 
   .dashboard-root .menu-toggle {
