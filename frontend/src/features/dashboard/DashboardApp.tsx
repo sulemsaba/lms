@@ -11,6 +11,12 @@ interface NavSection {
   items: NavItem[];
 }
 
+interface StudentFeature {
+  label: string;
+  icon: string;
+  summary: string;
+}
+
 interface CalendarDay {
   label: string;
   muted?: boolean;
@@ -23,27 +29,62 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: "Dashboard", icon: "dashboard" },
       { label: "Campus Map", icon: "map" },
+      { label: "Search", icon: "search" },
+      { label: "Profile", icon: "person" }
+    ]
+  },
+  {
+    title: "Academics",
+    items: [
       { label: "My Courses", icon: "menu_book" },
+      { label: "Assessments", icon: "assignment" },
       { label: "Assignments", icon: "assignment" },
-      { label: "Timetable", icon: "calendar_month" }
+      { label: "Timetable", icon: "calendar_month" },
+      { label: "Results", icon: "account_balance" }
     ]
   },
   {
     title: "University",
     items: [
-      { label: "Results", icon: "account_balance" },
       { label: "Payments", icon: "receipt_long" },
-      { label: "Community", icon: "forum" }
+      { label: "Community", icon: "forum" },
+      { label: "Helpdesk", icon: "support_agent" }
     ]
   },
   {
     title: "Productivity",
     items: [
+      { label: "Tasks", icon: "checklist" },
+      { label: "Notes", icon: "edit_note" },
+      { label: "Alerts", icon: "notifications" },
+      { label: "Queue Manager", icon: "sync" },
       { label: "Focus Mode", icon: "timer" },
       { label: "Resources", icon: "folder_open" },
       { label: "Study Groups", icon: "group" }
     ]
   }
+];
+
+const STUDENT_FEATURES: StudentFeature[] = [
+  { label: "Dashboard", icon: "dashboard", summary: "Overview and quick actions" },
+  { label: "Campus Map", icon: "map", summary: "Navigation and facilities" },
+  { label: "Search", icon: "search", summary: "Find courses and resources" },
+  { label: "My Courses", icon: "menu_book", summary: "Course modules and content" },
+  { label: "Assessments", icon: "assignment", summary: "Quizzes and exams" },
+  { label: "Assignments", icon: "assignment", summary: "Deadlines and submissions" },
+  { label: "Timetable", icon: "calendar_month", summary: "Class and event schedule" },
+  { label: "Results", icon: "account_balance", summary: "Grades and transcripts" },
+  { label: "Payments", icon: "receipt_long", summary: "Fees and payment records" },
+  { label: "Community", icon: "forum", summary: "Forums and announcements" },
+  { label: "Helpdesk", icon: "support_agent", summary: "Student support tickets" },
+  { label: "Tasks", icon: "checklist", summary: "Personal task manager" },
+  { label: "Notes", icon: "edit_note", summary: "Study notes and reminders" },
+  { label: "Alerts", icon: "notifications", summary: "Important notifications" },
+  { label: "Queue Manager", icon: "sync", summary: "Offline sync queue" },
+  { label: "Focus Mode", icon: "timer", summary: "Pomodoro focus sessions" },
+  { label: "Resources", icon: "folder_open", summary: "Recent and saved files" },
+  { label: "Study Groups", icon: "group", summary: "Peer collaboration" },
+  { label: "Profile", icon: "person", summary: "Account and session settings" }
 ];
 
 const DAY_HEADERS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -258,6 +299,29 @@ export default function DashboardApp() {
                 <span className="stat-label">Next Class</span>
                 <span className="stat-value">45m</span>
                 <span className="stat-sub">CS101 - Hall 4</span>
+              </div>
+            </div>
+
+            <div className="card student-features">
+              <div className="card-header">
+                <h3 className="card-title">All Student Features</h3>
+                <span className="card-action">{STUDENT_FEATURES.length} Modules</span>
+              </div>
+              <div className="feature-grid">
+                {STUDENT_FEATURES.map((feature) => (
+                  <button
+                    key={feature.label}
+                    type="button"
+                    className={`feature-tile${activeNavItem === feature.label ? " active" : ""}`}
+                    onClick={() => setActiveNavItem(feature.label)}
+                  >
+                    <span className="material-symbols-rounded">{feature.icon}</span>
+                    <span className="feature-copy">
+                      <span className="feature-title">{feature.label}</span>
+                      <span className="feature-sub">{feature.summary}</span>
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
 
