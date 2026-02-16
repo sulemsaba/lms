@@ -7,7 +7,6 @@ import {
   selectEffectiveRoleCodes,
   useAuthStore
 } from "@/stores/authStore";
-import { useThemeStore } from "@/stores/themeStore";
 import styles from "./BottomNav.module.css";
 
 /**
@@ -17,9 +16,6 @@ export default function BottomNav() {
   const roleCodes = useAuthStore(selectEffectiveRoleCodes);
   const permissions = useAuthStore(selectEffectivePermissions);
   const items = useMemo(() => buildNavItems(roleCodes, permissions), [roleCodes, permissions]);
-  const theme = useThemeStore((state) => state.theme);
-  const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  const nextThemeLabel = theme === "dark" ? "Switch To Light" : "Switch To Dark";
 
   return (
     <aside className={styles.container} data-testid="side-nav">
@@ -40,12 +36,6 @@ export default function BottomNav() {
           </NavLink>
         ))}
       </nav>
-      <div className={styles.footer}>
-        <button type="button" className={styles.themeToggle} onClick={toggleTheme}>
-          <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size={20} />
-          <span>{nextThemeLabel}</span>
-        </button>
-      </div>
     </aside>
   );
 }

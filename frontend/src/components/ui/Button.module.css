@@ -14,13 +14,13 @@
 
 .primary {
   background: var(--color-primary);
-  color: var(--color-text-primary);
+  color: #ffffff;
 }
 
 .secondary {
   background: transparent;
-  color: var(--color-text-primary);
-  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary-light);
 }
 
 .destructive {

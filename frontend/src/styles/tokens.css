@@ -1,27 +1,29 @@
 :root {
-  /* Primary palette – UDSM identity + student-focused calmness */
-  --color-primary: #6dd7fd;
-  --color-secondary: #f5ffff;
-  --color-success: #089000;
-  --color-accent: #4c00a4;
-  --color-warning: #f57c00;
-  --color-error: #c62828;
+  /* Dashboard palette */
+  --color-primary: #4f46e5;
+  --color-primary-light: #818cf8;
+  --color-primary-soft: #e0e7ff;
+  --color-secondary: #7c3aed;
+  --color-success: #10b981;
+  --color-accent: #f43f5e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 
   /* Neutrals */
-  --color-text-primary: #212121;
-  --color-text-secondary: #757575;
-  --color-border: #e0e0e0;
-  --color-background: #ffffff;
-  --color-surface: #f5ffff;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-background: #f3f4f6;
+  --color-surface: #ffffff;
   --color-elevated: #ffffff;
 
   /* Typography */
-  --font-family: "Roboto", system-ui, sans-serif;
+  --font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-base: 16px;
   --font-size-lg: 18px;
-  --font-size-xl: 22px;
+  --font-size-xl: 24px;
   --font-size-2xl: 28px;
 
   /* Spacing (8dp grid) */
@@ -32,33 +34,37 @@
   --spacing-xl: 32px;
 
   /* Borders */
-  --border-radius-sm: 4px;
-  --border-radius-md: 8px;
-  --border-radius-lg: 12px;
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 20px;
 
   /* Shadows */
-  --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-elevation-2: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-elevation-1: 0 1px 2px rgb(0 0 0 / 5%);
+  --shadow-elevation-2: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
+  --shadow-elevation-soft: 0 20px 25px -5px rgb(0 0 0 / 5%), 0 8px 10px -6px rgb(0 0 0 / 1%);
 
   /* Touch targets */
   --touch-target-min: 48px;
 }
 
 :root[data-theme="dark"] {
-  --color-primary: #4fc3f7;
-  --color-secondary: #1e2a33;
-  --color-success: #52c97a;
-  --color-accent: #8f85ff;
-  --color-warning: #ffb74d;
+  --color-primary: #818cf8;
+  --color-primary-light: #a5b4fc;
+  --color-primary-soft: #312e81;
+  --color-secondary: #a78bfa;
+  --color-success: #34d399;
+  --color-accent: #fb7185;
+  --color-warning: #fbbf24;
   --color-error: #ff8a80;
 
   --color-text-primary: #f3f6fa;
   --color-text-secondary: #b5c0cc;
-  --color-border: #314050;
-  --color-background: #101820;
-  --color-surface: #152430;
-  --color-elevated: #1b2d3b;
+  --color-border: #2b3345;
+  --color-background: #101828;
+  --color-surface: #0f172a;
+  --color-elevated: #111f36;
 
-  --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-elevation-2: 0 3px 8px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(0, 0, 0, 0.35);
+  --shadow-elevation-1: 0 1px 3px rgb(0 0 0 / 45%), 0 1px 2px rgb(0 0 0 / 35%);
+  --shadow-elevation-2: 0 3px 8px rgb(0 0 0 / 50%), 0 2px 5px rgb(0 0 0 / 35%);
+  --shadow-elevation-soft: 0 18px 26px -8px rgb(0 0 0 / 45%), 0 8px 12px -10px rgb(0 0 0 / 60%);
 }
