@@ -25,24 +25,26 @@ export default function App() {
         </section>
       )}
 
-      <section className="status-card" aria-live="polite">
-        <h2>Sync Health</h2>
-        <p>
-          Status: <strong>{status}</strong>
-        </p>
-        <p>Queue depth: {queueDepth}</p>
-        <p>Last sync: {lastSync}</p>
-      </section>
+      <div className="dashboard-grid">
+        <section className="status-card" aria-live="polite">
+          <h2>Sync Health</h2>
+          <p>
+            Status: <strong>{status}</strong>
+          </p>
+          <p>Queue depth: {queueDepth}</p>
+          <p>Last sync: {lastSync}</p>
+        </section>
 
-      <section className="receipt-section">
-        <h2>Latest Receipt</h2>
-        <ReceiptCard
-          state={isOffline ? "offline" : "online"}
-          receiptId="UDSM-2026-000001"
-          submissionRef="ASM-DSA-1001"
-          timestamp="2026-02-13T08:30:00Z"
-        />
-      </section>
+        <section className="receipt-section">
+          <h2>Latest Receipt</h2>
+          <ReceiptCard
+            state={isOffline ? "offline" : "online"}
+            receiptId="UDSM-2026-000001"
+            submissionRef="ASM-DSA-1001"
+            timestamp="2026-02-13T08:30:00Z"
+          />
+        </section>
+      </div>
 
       <nav className="bottom-nav" aria-label="Primary Navigation">
         <button type="button">Home</button>

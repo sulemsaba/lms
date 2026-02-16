@@ -93,3 +93,17 @@ body {
   background: var(--udsm-color-surface);
   border-radius: var(--udsm-radius-sm);
 }
+
+/* Responsive Dashboard Grid */
+@media (min-width: 768px) {
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--udsm-space-6);
+    align-items: start;
+  }
+
+  .dashboard-grid .receipt-section {
+    margin-top: 0;
+  }
+}
