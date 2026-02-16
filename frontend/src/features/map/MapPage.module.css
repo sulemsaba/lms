@@ -6,18 +6,363 @@
 .toolbar {
   display: flex;
   gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.searchField {
+  flex: 1;
+  min-width: min(100%, 320px);
+  min-height: var(--touch-target-min);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-elevated);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-xs);
+}
+
+.searchIcon {
+  color: var(--color-text-secondary);
 }
 
 .input {
   flex: 1;
-  min-height: var(--touch-target-min);
+  border: none;
+  outline: none;
+  background: transparent;
+  min-height: 40px;
+}
+
+.clearButton {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
+  background: var(--color-elevated);
+  padding: 0 var(--spacing-md);
+  cursor: pointer;
+  min-height: var(--touch-target-min);
+}
+
+.filterBar {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-elevated);
+  color: var(--color-text-secondary);
   padding: 0 var(--spacing-sm);
+  min-height: 40px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+}
+
+.filterButtonActive {
+  color: #ffffff;
+  border-color: transparent;
+  background: linear-gradient(120deg, #4f46e5, #7c3aed);
 }
 
 .hint {
   margin: 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+.mapLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: var(--spacing-md);
+}
+
+.mapCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-elevated);
+  overflow: hidden;
+}
+
+.legend {
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.sidePanel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md);
+  background: var(--color-elevated);
+  display: grid;
+  gap: var(--spacing-sm);
+  max-height: 640px;
+  overflow-y: auto;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.panelHeader h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.categoryTag {
+  font-size: var(--font-size-xs);
+  color: #ffffff;
+  background: #1f2937;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.description {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.metaLine {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+}
+
+.infoBlock {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.infoBlock h4 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.infoPill {
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: var(--font-size-xs);
+}
+
+.infoPillMuted {
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: var(--font-size-xs);
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.floorPlanSection {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.floorPlanSection h4 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.floorTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.floorTab {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-elevated);
+  color: var(--color-text-secondary);
+  padding: 4px 10px;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.floorTabActive {
+  color: #ffffff;
+  border-color: transparent;
+  background: #1d4ed8;
+}
+
+.floorSpaces {
+  display: grid;
+  gap: 6px;
+}
+
+.spaceRow {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 10px;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spaceBadge {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: var(--font-size-xs);
+}
+
+.space_classroom {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.space_lab {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.space_restroom {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.space_elevator {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.space_quiet_zone {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.space_study_room {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.space_office {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.space_entrance {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.locationListCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md);
+  background: var(--color-elevated);
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.locationListHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.locationListHeader h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.locationListHeader p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.locationList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-xs);
+}
+
+.locationRow {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-surface);
+  min-height: var(--touch-target-min);
+  padding: 0 var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  text-align: left;
+  cursor: pointer;
+}
+
+.locationRowActive {
+  border-color: #4f46e5;
+  background: #e0e7ff;
+}
+
+.locationText {
+  display: grid;
+}
+
+.locationText strong {
+  font-size: var(--font-size-sm);
+}
+
+.locationText small {
+  color: var(--color-text-secondary);
+}
+
+.emptyState {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 1100px) {
+  .mapLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidePanel {
+    max-height: none;
+  }
 }
