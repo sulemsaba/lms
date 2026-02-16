@@ -1,0 +1,99 @@
+.theme-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 120;
+  width: 52px;
+  height: 52px;
+  border: 1px solid color-mix(in srgb, var(--color-primary-light) 45%, #ffffff);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, #ffffff 0%, #f8fafc 34%, #eef2ff 100%),
+    linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 8px 24px rgb(79 70 229 / 28%),
+    inset 0 1px 0 rgb(255 255 255 / 75%);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow:
+    0 14px 28px rgb(79 70 229 / 34%),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
+}
+
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--color-primary) 35%, #ffffff),
+    0 14px 28px rgb(79 70 229 / 34%);
+}
+
+.theme-toggle__classic {
+  font-size: 28px;
+  transition: transform 0.45s ease;
+}
+
+.theme-toggle__classic circle {
+  transition: transform 0.45s ease;
+  transform-origin: center;
+}
+
+.theme-toggle__classic g[stroke="currentColor"] {
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s ease;
+  transform-origin: center;
+}
+
+:root[data-theme="dark"] .theme-toggle {
+  border-color: color-mix(in srgb, var(--color-primary-light) 42%, #111827);
+  background:
+    radial-gradient(circle at 35% 30%, #1f2937 0%, #111827 40%, #0b1220 100%),
+    linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #f8fafc;
+  box-shadow:
+    0 10px 26px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+:root[data-theme="dark"] .theme-toggle__classic {
+  transform: rotate(-20deg);
+}
+
+:root[data-theme="dark"] .theme-toggle__classic circle {
+  transform: scale(0.92);
+}
+
+:root[data-theme="dark"] .theme-toggle__classic g[stroke="currentColor"] {
+  opacity: 0.25;
+  transform: scale(0.78);
+}
+
+@media (max-width: 640px) {
+  .theme-toggle {
+    right: 14px;
+    bottom: 14px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .theme-toggle__classic {
+    font-size: 25px;
+  }
+}
