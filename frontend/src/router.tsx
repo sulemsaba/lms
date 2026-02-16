@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell";
-import HomePage from "@/features/home/HomePage";
+import DashboardApp from "@/features/dashboard/DashboardApp";
 import CoursesPage from "@/features/courses/CoursesPage";
 import AssessmentsPage from "@/features/assessments/AssessmentsPage";
 import MapPage from "@/features/map/MapPage";
@@ -25,11 +25,18 @@ export const router = createBrowserRouter([
     path: "/",
     element: (
       <RequireAuth>
+        <DashboardApp />
+      </RequireAuth>
+    )
+  },
+  {
+    path: "/",
+    element: (
+      <RequireAuth>
         <AppShell />
       </RequireAuth>
     ),
     children: [
-      { index: true, element: <HomePage /> },
       { path: "courses", element: <CoursesPage /> },
       { path: "assessments", element: <AssessmentsPage /> },
       { path: "map", element: <MapPage /> },

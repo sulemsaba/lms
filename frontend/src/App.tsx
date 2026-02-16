@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import DashboardApp from "@/features/dashboard/DashboardApp";
+import { RouterProvider } from "react-router-dom";
+import { router } from "@/router";
 import { registerServiceWorker } from "@/services/sync/registerSW";
 import {
   registerOnlineSyncTrigger,
@@ -8,12 +9,14 @@ import {
   syncWithExponentialBackoff
 } from "@/services/sync/backgroundSync";
 import { useSyncStore } from "@/stores/syncStore";
+import { useThemeStore } from "@/stores/themeStore";
 
 /**
- * Root app component binding dashboard UI and offline sync wiring.
+ * Root app component binding routing and offline sync wiring.
  */
 export default function App() {
   const setSyncStatus = useSyncStore((state) => state.setSyncStatus);
+  const theme = useThemeStore((state) => state.theme);
 
   useEffect(() => {
     registerServiceWorker();
@@ -46,5 +49,10 @@ export default function App() {
     };
   }, [setSyncStatus]);
 
-  return <DashboardApp />;
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
+
+  return <RouterProvider router={router} />;
 }
