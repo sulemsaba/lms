@@ -93,6 +93,7 @@ const formatFocusClock = (seconds: number): string => {
  */
 export default function DashboardApp() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState("Dashboard");
   const [timerRunning, setTimerRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(FOCUS_DURATION_SECONDS);
@@ -141,12 +142,25 @@ export default function DashboardApp() {
 
   return (
     <div className="dashboard-root">
-      <aside id="sidebar" className={sidebarOpen ? "active" : undefined}>
+      <aside
+        id="sidebar"
+        className={`${sidebarOpen ? "active" : ""} ${sidebarCollapsed ? "collapsed" : ""}`.trim()}
+      >
         <div className="brand">
           <div className="brand-icon">
             <span className="material-symbols-rounded">school</span>
           </div>
           <div className="brand-text">UDSM Hub</div>
+          <button
+            type="button"
+            className="sidebar-shrink"
+            onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <span className="material-symbols-rounded">
+              {sidebarCollapsed ? "keyboard_double_arrow_right" : "keyboard_double_arrow_left"}
+            </span>
+          </button>
         </div>
 
         <ul className="nav-menu">
@@ -159,9 +173,10 @@ export default function DashboardApp() {
                     href="#"
                     className={`nav-link${activeNavItem === item.label ? " active" : ""}`}
                     onClick={onSelectNav(item.label)}
+                    title={item.label}
                   >
-                    <span className="material-symbols-rounded">{item.icon}</span>
-                    {item.label}
+                    <span className="material-symbols-rounded nav-icon">{item.icon}</span>
+                    <span className="nav-label">{item.label}</span>
                   </a>
                 </li>
               ))}
