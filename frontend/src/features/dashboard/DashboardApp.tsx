@@ -1,9 +1,11 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./DashboardApp.css";
 
 interface NavItem {
   label: string;
   icon: string;
+  path: string;
 }
 
 interface NavSection {
@@ -15,6 +17,7 @@ interface StudentFeature {
   label: string;
   icon: string;
   summary: string;
+  path: string;
 }
 
 interface CalendarDay {
@@ -27,64 +30,64 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: "Dashboard",
     items: [
-      { label: "Dashboard", icon: "dashboard" },
-      { label: "Campus Map", icon: "map" },
-      { label: "Search", icon: "search" },
-      { label: "Profile", icon: "person" }
+      { label: "Dashboard", icon: "dashboard", path: "/" },
+      { label: "Campus Map", icon: "map", path: "/map" },
+      { label: "Search", icon: "search", path: "/search" },
+      { label: "Profile", icon: "person", path: "/profile" }
     ]
   },
   {
     title: "Academics",
     items: [
-      { label: "My Courses", icon: "menu_book" },
-      { label: "Assessments", icon: "assignment" },
-      { label: "Assignments", icon: "assignment" },
-      { label: "Timetable", icon: "calendar_month" },
-      { label: "Results", icon: "account_balance" }
+      { label: "My Courses", icon: "menu_book", path: "/courses" },
+      { label: "Assessments", icon: "assignment", path: "/assessments" },
+      { label: "Assignments", icon: "assignment", path: "/assignments" },
+      { label: "Timetable", icon: "calendar_month", path: "/timetable" },
+      { label: "Results", icon: "account_balance", path: "/results" }
     ]
   },
   {
     title: "University",
     items: [
-      { label: "Payments", icon: "receipt_long" },
-      { label: "Community", icon: "forum" },
-      { label: "Helpdesk", icon: "support_agent" }
+      { label: "Payments", icon: "receipt_long", path: "/payments" },
+      { label: "Community", icon: "forum", path: "/community" },
+      { label: "Helpdesk", icon: "support_agent", path: "/helpdesk" }
     ]
   },
   {
     title: "Productivity",
     items: [
-      { label: "Tasks", icon: "checklist" },
-      { label: "Notes", icon: "edit_note" },
-      { label: "Alerts", icon: "notifications" },
-      { label: "Queue Manager", icon: "sync" },
-      { label: "Focus Mode", icon: "timer" },
-      { label: "Resources", icon: "folder_open" },
-      { label: "Study Groups", icon: "group" }
+      { label: "Tasks", icon: "checklist", path: "/tasks" },
+      { label: "Notes", icon: "edit_note", path: "/notes" },
+      { label: "Alerts", icon: "notifications", path: "/notifications" },
+      { label: "Queue Manager", icon: "sync", path: "/queue-manager" },
+      { label: "Focus Mode", icon: "timer", path: "/focus-mode" },
+      { label: "Resources", icon: "folder_open", path: "/resources" },
+      { label: "Study Groups", icon: "group", path: "/study-groups" }
     ]
   }
 ];
 
 const STUDENT_FEATURES: StudentFeature[] = [
-  { label: "Dashboard", icon: "dashboard", summary: "Overview and quick actions" },
-  { label: "Campus Map", icon: "map", summary: "Navigation and facilities" },
-  { label: "Search", icon: "search", summary: "Find courses and resources" },
-  { label: "My Courses", icon: "menu_book", summary: "Course modules and content" },
-  { label: "Assessments", icon: "assignment", summary: "Quizzes and exams" },
-  { label: "Assignments", icon: "assignment", summary: "Deadlines and submissions" },
-  { label: "Timetable", icon: "calendar_month", summary: "Class and event schedule" },
-  { label: "Results", icon: "account_balance", summary: "Grades and transcripts" },
-  { label: "Payments", icon: "receipt_long", summary: "Fees and payment records" },
-  { label: "Community", icon: "forum", summary: "Forums and announcements" },
-  { label: "Helpdesk", icon: "support_agent", summary: "Student support tickets" },
-  { label: "Tasks", icon: "checklist", summary: "Personal task manager" },
-  { label: "Notes", icon: "edit_note", summary: "Study notes and reminders" },
-  { label: "Alerts", icon: "notifications", summary: "Important notifications" },
-  { label: "Queue Manager", icon: "sync", summary: "Offline sync queue" },
-  { label: "Focus Mode", icon: "timer", summary: "Pomodoro focus sessions" },
-  { label: "Resources", icon: "folder_open", summary: "Recent and saved files" },
-  { label: "Study Groups", icon: "group", summary: "Peer collaboration" },
-  { label: "Profile", icon: "person", summary: "Account and session settings" }
+  { label: "Dashboard", icon: "dashboard", summary: "Overview and quick actions", path: "/" },
+  { label: "Campus Map", icon: "map", summary: "Navigation and facilities", path: "/map" },
+  { label: "Search", icon: "search", summary: "Find courses and resources", path: "/search" },
+  { label: "My Courses", icon: "menu_book", summary: "Course modules and content", path: "/courses" },
+  { label: "Assessments", icon: "assignment", summary: "Quizzes and exams", path: "/assessments" },
+  { label: "Assignments", icon: "assignment", summary: "Deadlines and submissions", path: "/assignments" },
+  { label: "Timetable", icon: "calendar_month", summary: "Class and event schedule", path: "/timetable" },
+  { label: "Results", icon: "account_balance", summary: "Grades and transcripts", path: "/results" },
+  { label: "Payments", icon: "receipt_long", summary: "Fees and payment records", path: "/payments" },
+  { label: "Community", icon: "forum", summary: "Forums and announcements", path: "/community" },
+  { label: "Helpdesk", icon: "support_agent", summary: "Student support tickets", path: "/helpdesk" },
+  { label: "Tasks", icon: "checklist", summary: "Personal task manager", path: "/tasks" },
+  { label: "Notes", icon: "edit_note", summary: "Study notes and reminders", path: "/notes" },
+  { label: "Alerts", icon: "notifications", summary: "Important notifications", path: "/notifications" },
+  { label: "Queue Manager", icon: "sync", summary: "Offline sync queue", path: "/queue-manager" },
+  { label: "Focus Mode", icon: "timer", summary: "Pomodoro focus sessions", path: "/focus-mode" },
+  { label: "Resources", icon: "folder_open", summary: "Recent and saved files", path: "/resources" },
+  { label: "Study Groups", icon: "group", summary: "Peer collaboration", path: "/study-groups" },
+  { label: "Profile", icon: "person", summary: "Account and session settings", path: "/profile" }
 ];
 
 const DAY_HEADERS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -133,9 +136,10 @@ const formatFocusClock = (seconds: number): string => {
  * Static dashboard view that mirrors the provided UDSM layout.
  */
 export default function DashboardApp() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeNavItem, setActiveNavItem] = useState("Dashboard");
   const [timerRunning, setTimerRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(FOCUS_DURATION_SECONDS);
   const timerRef = useRef<number | null>(null);
@@ -173,12 +177,26 @@ export default function DashboardApp() {
     };
   }, [timerRunning]);
 
-  const onSelectNav = (label: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const onSelectNav = (path: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    setActiveNavItem(label);
+    navigate(path);
     if (window.innerWidth <= 768) {
       setSidebarOpen(false);
     }
+  };
+
+  const onSelectFeature = (path: string) => {
+    navigate(path);
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
+  };
+
+  const isPathActive = (path: string): boolean => {
+    if (path === "/") {
+      return pathname === "/";
+    }
+    return pathname === path;
   };
 
   return (
@@ -211,9 +229,9 @@ export default function DashboardApp() {
               {section.items.map((item) => (
                 <li className="nav-item" key={item.label}>
                   <a
-                    href="#"
-                    className={`nav-link${activeNavItem === item.label ? " active" : ""}`}
-                    onClick={onSelectNav(item.label)}
+                    href={item.path}
+                    className={`nav-link${isPathActive(item.path) ? " active" : ""}`}
+                    onClick={onSelectNav(item.path)}
                     title={item.label}
                   >
                     <span className="material-symbols-rounded nav-icon">{item.icon}</span>
@@ -312,8 +330,8 @@ export default function DashboardApp() {
                   <button
                     key={feature.label}
                     type="button"
-                    className={`feature-tile${activeNavItem === feature.label ? " active" : ""}`}
-                    onClick={() => setActiveNavItem(feature.label)}
+                    className={`feature-tile${isPathActive(feature.path) ? " active" : ""}`}
+                    onClick={() => onSelectFeature(feature.path)}
                   >
                     <span className="material-symbols-rounded">{feature.icon}</span>
                     <span className="feature-copy">
