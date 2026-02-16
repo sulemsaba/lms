@@ -19,9 +19,10 @@ interface CalendarDay {
 
 const NAV_SECTIONS: NavSection[] = [
   {
-    title: "Main Menu",
+    title: "Dashboard",
     items: [
       { label: "Dashboard", icon: "dashboard" },
+      { label: "Campus Map", icon: "map" },
       { label: "My Courses", icon: "menu_book" },
       { label: "Assignments", icon: "assignment" },
       { label: "Timetable", icon: "calendar_month" }
@@ -33,6 +34,14 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Results", icon: "account_balance" },
       { label: "Payments", icon: "receipt_long" },
       { label: "Community", icon: "forum" }
+    ]
+  },
+  {
+    title: "Productivity",
+    items: [
+      { label: "Focus Mode", icon: "timer" },
+      { label: "Resources", icon: "folder_open" },
+      { label: "Study Groups", icon: "group" }
     ]
   }
 ];
