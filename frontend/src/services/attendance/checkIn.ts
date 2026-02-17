@@ -89,6 +89,10 @@ const VENUE_ALIAS_COORDINATES: Record<string, [number, number]> = {
   "b205 kijitonyama": [-6.7716, 39.2408],
   "b307 kijitonyama": [-6.7716, 39.2408],
   "b302 kijitonyama": [-6.7716, 39.2408],
+  "room 201": [-6.7808, 39.204],
+  "room 203": [-6.7808, 39.204],
+  "cs building": [-6.783, 39.207],
+  "coet block a": [-6.783, 39.207],
   "main gate": [-6.7825, 39.2025]
 };
 

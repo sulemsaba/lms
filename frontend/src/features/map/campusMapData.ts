@@ -64,6 +64,8 @@ export interface AccessibleRoute {
   id: string;
   label: string;
   path: [number, number][];
+  accessible?: boolean;
+  weightMultiplier?: number;
 }
 
 interface CategoryConfig {
@@ -1042,27 +1044,37 @@ export const CAMPUS_ACCESSIBLE_ROUTES: AccessibleRoute[] = [
   {
     id: "route-main-gate-nkrumah",
     label: "Step-free route: Main Gate to Nkrumah Hall",
-    path: [at(-6.7825, 39.2025), at(-6.7818, 39.2032), at(-6.7811, 39.204), at(-6.7805, 39.2046)]
+    path: [at(-6.7825, 39.2025), at(-6.7818, 39.2032), at(-6.7811, 39.204), at(-6.7805, 39.2046)],
+    accessible: true,
+    weightMultiplier: 1
   },
   {
     id: "route-nkrumah-old-library",
     label: "Step-free route: Nkrumah Hall to Old Library",
-    path: [at(-6.7805, 39.2046), at(-6.7802, 39.205), at(-6.77995, 39.2053), at(-6.7798, 39.2055)]
+    path: [at(-6.7805, 39.2046), at(-6.7802, 39.205), at(-6.77995, 39.2053), at(-6.7798, 39.2055)],
+    accessible: true,
+    weightMultiplier: 1
   },
   {
     id: "route-nkrumah-new-library",
     label: "Step-free route: Nkrumah Hall to New Library",
-    path: [at(-6.7805, 39.2046), at(-6.7798, 39.2049), at(-6.7787, 39.2051), at(-6.7772, 39.2052), at(-6.7758, 39.2052)]
+    path: [at(-6.7805, 39.2046), at(-6.7798, 39.2049), at(-6.7787, 39.2051), at(-6.7772, 39.2052), at(-6.7758, 39.2052)],
+    accessible: true,
+    weightMultiplier: 1
   },
   {
     id: "route-nkrumah-coet",
     label: "Step-free route: Nkrumah Hall to CoET",
-    path: [at(-6.7805, 39.2046), at(-6.7812, 39.2055), at(-6.782, 39.2062), at(-6.783, 39.207)]
+    path: [at(-6.7805, 39.2046), at(-6.7812, 39.2055), at(-6.782, 39.2062), at(-6.783, 39.207)],
+    accessible: true,
+    weightMultiplier: 1
   },
   {
     id: "route-coet-uhc",
     label: "Step-free route: CoET to University Health Centre",
-    path: [at(-6.783, 39.207), at(-6.7828, 39.2074), at(-6.7825, 39.2078), at(-6.782, 39.208)]
+    path: [at(-6.783, 39.207), at(-6.7828, 39.2074), at(-6.7825, 39.2078), at(-6.782, 39.208)],
+    accessible: true,
+    weightMultiplier: 1
   }
 ];
 

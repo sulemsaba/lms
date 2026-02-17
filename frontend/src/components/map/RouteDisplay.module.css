@@ -14,8 +14,48 @@
   font-size: var(--font-size-lg);
 }
 
+.meta {
+  margin: 0;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-sm);
+}
+
+.sourceBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  padding: 2px 10px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
 .step {
   margin: 0;
   color: var(--color-text-secondary);
   line-height: 1.45;
+}
+
+.warning {
+  margin: 0;
+  color: #92400e;
+  background: #ffedd5;
+  border: 1px solid #fed7aa;
+  border-radius: var(--border-radius-md);
+  padding: 8px 10px;
+  font-size: var(--font-size-sm);
+}
+
+.error {
+  margin: 0;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: var(--border-radius-md);
+  padding: 8px 10px;
+  font-size: var(--font-size-sm);
 }
