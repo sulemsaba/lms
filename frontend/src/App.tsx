@@ -9,6 +9,7 @@ import {
   refreshSyncQueueMetrics,
   syncWithExponentialBackoff
 } from "@/services/sync/backgroundSync";
+import { warmupOfflineCoreData } from "@/services/offline/offlineWarmup";
 import { useSyncStore } from "@/stores/syncStore";
 import { useThemeStore } from "@/stores/themeStore";
 
@@ -26,11 +27,15 @@ export default function App() {
     void refreshSyncQueueMetrics();
     if (navigator.onLine) {
       void syncWithExponentialBackoff();
+      void warmupOfflineCoreData();
     }
 
     const updateStatus = () => {
       setSyncStatus(navigator.onLine ? "online" : "offline");
       void refreshSyncQueueMetrics();
+      if (navigator.onLine) {
+        void warmupOfflineCoreData();
+      }
     };
 
     updateStatus();

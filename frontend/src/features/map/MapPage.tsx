@@ -55,6 +55,20 @@ const locationMatchesQuery = (location: CampusLocation, normalizedQuery: string)
   return searchableTokens.some((token) => token.toLowerCase().includes(normalizedQuery));
 };
 
+const toRadians = (value: number): number => (value * Math.PI) / 180;
+
+const calculateDistanceMeters = (left: [number, number], right: [number, number]): number => {
+  const earthRadiusMeters = 6_371_000;
+  const deltaLat = toRadians(right[0] - left[0]);
+  const deltaLng = toRadians(right[1] - left[1]);
+  const lat1 = toRadians(left[0]);
+  const lat2 = toRadians(right[0]);
+  const haversine =
+    Math.sin(deltaLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+  const angularDistance = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  return earthRadiusMeters * angularDistance;
+};
+
 const buildRouteSteps = (location: CampusLocation | null): string[] => {
   if (!location) {
     return [
@@ -85,6 +99,9 @@ export default function MapPage() {
   const [networkVenues, setNetworkVenues] = useState<ReturnType<typeof enrichWithNetworkVenues>>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedFloorId, setSelectedFloorId] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [locationFeedback, setLocationFeedback] = useState("");
+  const [shareFeedback, setShareFeedback] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -155,13 +172,102 @@ export default function MapPage() {
     return selectedLocation.floorPlans.find((floor) => floor.id === selectedFloorId) ?? selectedLocation.floorPlans[0];
   }, [selectedFloorId, selectedLocation]);
 
-  const mapCenter = selectedLocation?.position ?? CAMPUS_CENTER;
+  const selectedMapCenter = selectedLocation?.position ?? CAMPUS_CENTER;
+  const mapCenter = userLocation ?? selectedMapCenter;
 
   const routeSteps = useMemo(() => buildRouteSteps(selectedLocation), [selectedLocation]);
 
   const onSelectLocation = useCallback((locationId: string) => {
     setSelectedLocationId(locationId);
+    setUserLocation(null);
   }, []);
+
+  const findNearestLocation = useCallback(
+    (position: [number, number]): CampusLocation | null =>
+      networkVenues.reduce((closest, location) => {
+        const distance = calculateDistanceMeters(position, location.position);
+        if (!closest || distance < closest.distance) {
+          return { location, distance };
+        }
+        return closest;
+      }, null as { location: CampusLocation; distance: number } | null)?.location ?? null,
+    [networkVenues]
+  );
+
+  const onLocateMe = useCallback(async () => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setLocationFeedback("Location services are unavailable in this browser.");
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords: [number, number] = [position.coords.latitude, position.coords.longitude];
+          setUserLocation(coords);
+          const nearest = findNearestLocation(coords);
+          if (nearest) {
+            setSelectedLocationId(nearest.id);
+            setLocationFeedback(`Centered on your location. Nearest stop: ${nearest.name}.`);
+          } else {
+            setLocationFeedback("Centered on your current location.");
+          }
+          resolve();
+        },
+        () => {
+          setLocationFeedback("Unable to read your location. Allow GPS permission and try again.");
+          resolve();
+        },
+        { enableHighAccuracy: true, timeout: 10_000, maximumAge: 45_000 }
+      );
+    });
+  }, [findNearestLocation]);
+
+  const onCenterDestination = useCallback(() => {
+    setUserLocation(null);
+    if (selectedLocation) {
+      setLocationFeedback(`Centered on ${selectedLocation.name}.`);
+      return;
+    }
+    setLocationFeedback("Centered on default campus view.");
+  }, [selectedLocation]);
+
+  const onShareLocation = useCallback(async () => {
+    const targetPoint = userLocation ?? selectedLocation?.position ?? null;
+    if (!targetPoint) {
+      setShareFeedback("Select a location first, then share.");
+      return;
+    }
+
+    const locationLabel = selectedLocation?.name ?? "My current campus location";
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${targetPoint[0]},${targetPoint[1]}`;
+
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      try {
+        await navigator.share({
+          title: "UDSM Location Share",
+          text: locationLabel,
+          url: mapUrl
+        });
+        setShareFeedback("Location shared.");
+        return;
+      } catch {
+        // Continue with clipboard fallback if user cancels or share is unavailable.
+      }
+    }
+
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(`${locationLabel}: ${mapUrl}`);
+        setShareFeedback("Location link copied to clipboard.");
+        return;
+      } catch {
+        // Fallback to plain text response if clipboard access fails.
+      }
+    }
+
+    setShareFeedback(`Share this link: ${mapUrl}`);
+  }, [selectedLocation, userLocation]);
 
   if (loading) {
     return <SkeletonLoader type="card" />;
@@ -207,6 +313,22 @@ export default function MapPage() {
       </div>
 
       {sourceLabel ? <p className={styles.hint}>{sourceLabel}</p> : null}
+      <div className={styles.quickActions} role="group" aria-label="Map quick actions">
+        <button type="button" className={styles.quickActionButton} onClick={() => void onLocateMe()}>
+          <span className="material-symbols-rounded">my_location</span>
+          <span>Locate Me</span>
+        </button>
+        <button type="button" className={styles.quickActionButton} onClick={() => onCenterDestination()}>
+          <span className="material-symbols-rounded">center_focus_strong</span>
+          <span>Center Destination</span>
+        </button>
+        <button type="button" className={styles.quickActionButton} onClick={() => void onShareLocation()}>
+          <span className="material-symbols-rounded">share_location</span>
+          <span>Share Location</span>
+        </button>
+      </div>
+      {locationFeedback ? <p className={styles.hint}>{locationFeedback}</p> : null}
+      {shareFeedback ? <p className={styles.hint}>{shareFeedback}</p> : null}
 
       <div className={styles.mapLayout}>
         <div className={styles.mapCard}>

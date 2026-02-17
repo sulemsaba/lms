@@ -25,3 +25,9 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
+
+.pushState {
+  margin: var(--spacing-xs) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

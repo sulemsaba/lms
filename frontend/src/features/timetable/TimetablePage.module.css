@@ -3,6 +3,26 @@
   gap: var(--spacing-sm);
 }
 
+.beaconPanel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  background: var(--color-elevated);
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.beaconPanel h3,
+.beaconPanel p {
+  margin: 0;
+}
+
+.beaconActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
 .item {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
