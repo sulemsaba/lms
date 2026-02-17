@@ -70,7 +70,7 @@ export async function enablePushAlerts(): Promise<EnablePushAlertsResult> {
   try {
     await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: base64UrlToUint8Array(VAPID_PUBLIC_KEY)
+      applicationServerKey: base64UrlToUint8Array(VAPID_PUBLIC_KEY) as unknown as BufferSource
     });
     return {
       permission,

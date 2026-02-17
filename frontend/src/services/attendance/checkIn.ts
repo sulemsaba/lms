@@ -1,6 +1,6 @@
 import { CORE_CAMPUS_LOCATIONS } from "@/features/map/campusMapData";
 import type { TimetableListItem } from "@/services/api/timetableApi";
-import { db } from "@/services/db";
+import { db, type OfflineAction } from "@/services/db";
 import { createIdempotencyKey, generateUuid } from "@/utils/id";
 
 const BEACON_CHECK_IN_RADIUS_METERS = 85;
@@ -11,7 +11,7 @@ const CHECK_IN_DUPLICATE_WINDOW_MS = 6 * 60 * 60 * 1000;
 type AttendanceMethod = "beacon" | "qr";
 type CheckInSource = "auto" | "manual";
 
-interface QueuedAttendancePayload {
+interface QueuedAttendancePayload extends Record<string, unknown> {
   method: AttendanceMethod;
   source: CheckInSource;
   eventId?: string;
@@ -148,7 +148,7 @@ const buildCheckInKey = (method: AttendanceMethod, eventId: string | undefined, 
 
 const findExistingCheckIn = (
   checkInKey: string,
-  actions: Awaited<ReturnType<typeof db.offlineActions.toArray>>,
+  actions: OfflineAction[],
   nowMs: number
 ): boolean =>
   actions.some((action) => {

@@ -36,18 +36,11 @@ export const router = createBrowserRouter([
     path: "/",
     element: (
       <RequireAuth>
-        {withSuspense(<DashboardApp />)}
-      </RequireAuth>
-    )
-  },
-  {
-    path: "/",
-    element: (
-      <RequireAuth>
         {withSuspense(<AppShell />)}
       </RequireAuth>
     ),
     children: [
+      { index: true, element: withSuspense(<DashboardApp />) },
       { path: "courses", element: withSuspense(<CoursesPage />) },
       { path: "assessments", element: withSuspense(<AssessmentsPage />) },
       { path: "assignments", element: withSuspense(<AssessmentsPage />) },

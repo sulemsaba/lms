@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/Icon";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { buildStudentFeaturePaths } from "@/features/auth/roleAccess";
@@ -68,8 +68,10 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
  * Unified sidebar used across dashboard and internal pages.
  */
 export default function BottomNav() {
+  const navigate = useNavigate();
   const roleCodes = useAuthStore(selectEffectiveRoleCodes);
   const permissions = useAuthStore(selectEffectivePermissions);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
   const allowedPaths = useMemo(() => new Set(buildStudentFeaturePaths(roleCodes, permissions)), [permissions, roleCodes]);
 
   const visibleSections = useMemo(
@@ -80,6 +82,11 @@ export default function BottomNav() {
       })).filter((section) => section.items.length > 0),
     [allowedPaths]
   );
+
+  const onLogout = () => {
+    clearAuth();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <aside className={styles.container} data-testid="side-nav">
@@ -108,8 +115,24 @@ export default function BottomNav() {
       </nav>
 
       <div className={styles.footer}>
-        <p className={styles.footerLabel}>Theme</p>
-        <ThemeToggle compact />
+        <div className={styles.footerActions}>
+          <NavLink to="/profile" className={styles.footerLink}>
+            <Icon name="settings" size={18} />
+            <span>Settings</span>
+          </NavLink>
+          <NavLink to="/helpdesk" className={styles.footerLink}>
+            <Icon name="help" size={18} />
+            <span>Help</span>
+          </NavLink>
+          <button type="button" className={styles.footerButton} onClick={onLogout}>
+            <Icon name="logout" size={18} />
+            <span>Log out</span>
+          </button>
+        </div>
+        <div className={styles.themeRow}>
+          <p className={styles.footerLabel}>Theme</p>
+          <ThemeToggle compact />
+        </div>
       </div>
     </aside>
   );
