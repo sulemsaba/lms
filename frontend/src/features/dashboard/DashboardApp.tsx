@@ -1,20 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
-import { buildStudentFeaturePaths } from "@/features/auth/roleAccess";
-import {
-  selectEffectivePermissions,
-  selectEffectiveRoleCodes,
-  useAuthStore
-} from "@/stores/authStore";
+import { useDashboard } from "@/hooks/useDashboard";
 import "./DashboardApp.css";
-
-interface StudentFeature {
-  label: string;
-  icon: string;
-  summary: string;
-  path: string;
-}
 
 interface CalendarDay {
   label: string;
@@ -22,28 +10,7 @@ interface CalendarDay {
   today?: boolean;
 }
 
-const STUDENT_FEATURES: StudentFeature[] = [
-  { label: "Dashboard", icon: "dashboard", summary: "Overview and quick actions", path: "/" },
-  { label: "Campus Map", icon: "map", summary: "Navigation and facilities", path: "/map" },
-  { label: "Search", icon: "search", summary: "Find courses and resources", path: "/search" },
-  { label: "My Courses", icon: "menu_book", summary: "Course modules and content", path: "/courses" },
-  { label: "Assessments", icon: "assignment", summary: "Quizzes and exams", path: "/assessments" },
-  { label: "Assignments", icon: "assignment", summary: "Deadlines and submissions", path: "/assignments" },
-  { label: "Timetable", icon: "calendar_month", summary: "Class and event schedule", path: "/timetable" },
-  { label: "Results", icon: "account_balance", summary: "Grades and transcripts", path: "/results" },
-  { label: "Payments", icon: "receipt_long", summary: "Fees and payment records", path: "/payments" },
-  { label: "Community", icon: "forum", summary: "Forums and announcements", path: "/community" },
-  { label: "Helpdesk", icon: "support_agent", summary: "Student support tickets", path: "/helpdesk" },
-  { label: "Tasks", icon: "checklist", summary: "Personal task manager", path: "/tasks" },
-  { label: "Notes", icon: "edit_note", summary: "Study notes and reminders", path: "/notes" },
-  { label: "Alerts", icon: "notifications", summary: "Important notifications", path: "/notifications" },
-  { label: "Queue Manager", icon: "sync", summary: "Offline sync queue", path: "/queue-manager" },
-  { label: "Focus Mode", icon: "timer", summary: "Pomodoro focus sessions", path: "/focus-mode" },
-  { label: "Resources", icon: "folder_open", summary: "Recent and saved files", path: "/resources" },
-  { label: "Study Groups", icon: "group", summary: "Peer collaboration", path: "/study-groups" },
-  { label: "Profile", icon: "person", summary: "Account and session settings", path: "/profile" }
-];
-
+// TODO: Make this calendar dynamic.
 const DAY_HEADERS = ["M", "T", "W", "T", "F", "S", "S"];
 const CALENDAR_DAYS: CalendarDay[] = [
   { label: "29", muted: true },
@@ -92,50 +59,36 @@ const formatFocusClock = (seconds: number): string => {
 export default function DashboardApp() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const roleCodes = useAuthStore(selectEffectiveRoleCodes);
-  const permissions = useAuthStore(selectEffectivePermissions);
   const [timerRunning, setTimerRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(FOCUS_DURATION_SECONDS);
-  const timerRef = useRef<number | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+
+  const { data: dashboardData, isLoading } = useDashboard();
 
   const currentDate = useMemo(() => new Date().toLocaleDateString("en-GB", DATE_OPTIONS), []);
   const timerText = useMemo(() => formatFocusClock(timeLeft), [timeLeft]);
   const timerProgress = timeLeft / FOCUS_DURATION_SECONDS;
   const timerStrokeOffset = RING_CIRCUMFERENCE * (1 - timerProgress);
-  const allowedPaths = useMemo(() => new Set(buildStudentFeaturePaths(roleCodes, permissions)), [permissions, roleCodes]);
-
-  const visibleStudentFeatures = useMemo(
-    () => STUDENT_FEATURES.filter((feature) => allowedPaths.has(feature.path)),
-    [allowedPaths]
-  );
 
   useEffect(() => {
-    if (!timerRunning) {
-      if (timerRef.current !== null) {
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      return;
-    }
+    workerRef.current = new Worker(new URL("../../workers/focus-timer.worker.ts", import.meta.url));
 
-    timerRef.current = window.setInterval(() => {
-      setTimeLeft((previous) => {
-        if (previous <= 1) {
-          setTimerRunning(false);
-          window.alert("Session Complete!");
-          return FOCUS_DURATION_SECONDS;
-        }
-        return previous - 1;
-      });
-    }, 1000);
+    workerRef.current.onmessage = (e) => {
+      setTimeLeft(e.data.timeLeft);
+    };
 
     return () => {
-      if (timerRef.current !== null) {
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+      workerRef.current?.terminate();
     };
-  }, [timerRunning]);
+  }, []);
+
+  useEffect(() => {
+    if (timerRunning) {
+      workerRef.current?.postMessage({ command: "start", duration: timeLeft });
+    } else {
+      workerRef.current?.postMessage({ command: "stop" });
+    }
+  }, [timerRunning, timeLeft]);
 
   const onSelectFeature = (path: string) => {
     navigate(path);
@@ -147,6 +100,10 @@ export default function DashboardApp() {
     }
     return pathname === path;
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="dashboard-root">
@@ -178,7 +135,7 @@ export default function DashboardApp() {
           <div className="grid-dashboard">
             <div className="banner">
               <div className="banner-content">
-                <h2>Welcome back, Suleiman!</h2>
+                <h2>{dashboardData?.welcomeMessage}</h2>
                 <p>
                   You have completed <strong>76%</strong> of your GPA target this semester. You have a Data Structures exam
                   coming up in 3 days.
@@ -193,36 +150,36 @@ export default function DashboardApp() {
             <div className="stats-row">
               <div className="stat-card blue">
                 <span className="stat-label">Current GPA</span>
-                <span className="stat-value">3.8</span>
+                <span className="stat-value">{dashboardData?.gpa}</span>
                 <span className="stat-sub text-up">
                   <span className="material-symbols-rounded trend-icon">trending_up</span>
-                  +0.2 vs last sem
+                  +{dashboardData?.gpaTrend} vs last sem
                 </span>
               </div>
               <div className="stat-card green">
                 <span className="stat-label">Attendance</span>
-                <span className="stat-value">95%</span>
+                <span className="stat-value">{dashboardData?.attendance}%</span>
                 <span className="stat-sub text-up">Excellent standing</span>
               </div>
               <div className="stat-card orange">
                 <span className="stat-label">Assignments</span>
-                <span className="stat-value">12</span>
-                <span className="stat-sub">3 Pending submission</span>
+                <span className="stat-value">{dashboardData?.assignments}</span>
+                <span className="stat-sub">{dashboardData?.assignmentsPending} Pending submission</span>
               </div>
               <div className="stat-card red">
                 <span className="stat-label">Next Class</span>
-                <span className="stat-value">45m</span>
-                <span className="stat-sub">CS101 - Hall 4</span>
+                <span className="stat-value">{dashboardData?.nextClassTime}</span>
+                <span className="stat-sub">{dashboardData?.nextClass}</span>
               </div>
             </div>
 
             <div className="card student-features">
               <div className="card-header">
                 <h3 className="card-title">All Student Features</h3>
-                <span className="card-action">{visibleStudentFeatures.length} Modules</span>
+                <span className="card-action">{dashboardData?.visibleStudentFeatures.length} Modules</span>
               </div>
               <div className="feature-grid">
-                {visibleStudentFeatures.map((feature) => (
+                {dashboardData?.visibleStudentFeatures.map((feature: any) => (
                   <button
                     key={feature.label}
                     type="button"
@@ -246,37 +203,18 @@ export default function DashboardApp() {
                   <span className="card-action">View Full Calendar</span>
                 </div>
 
-                <div className="list-item">
-                  <div className="item-icon primary">
-                    <span className="material-symbols-rounded">code</span>
+                {dashboardData?.schedule.map((item: any) => (
+                  <div className="list-item" key={item.title}>
+                    <div className={`item-icon ${item.iconColor}`}>
+                      <span className="material-symbols-rounded">{item.icon}</span>
+                    </div>
+                    <div className="item-content">
+                      <div className="item-title">{item.title}</div>
+                      <div className="item-sub">{item.time}</div>
+                    </div>
+                    {item.tag && <span className={`tag ${item.tagColor}`}>{item.tag}</span>}
                   </div>
-                  <div className="item-content">
-                    <div className="item-title">CS101: Intro to Programming</div>
-                    <div className="item-sub">10:00 AM - 12:00 PM - Lecture Hall 1</div>
-                  </div>
-                  <span className="tag lecture">Lecture</span>
-                </div>
-
-                <div className="list-item">
-                  <div className="item-icon orange">
-                    <span className="material-symbols-rounded">functions</span>
-                  </div>
-                  <div className="item-content">
-                    <div className="item-title">MT200: Discrete Mathematics</div>
-                    <div className="item-sub">02:00 PM - 04:00 PM - Seminar Room 3</div>
-                  </div>
-                  <span className="tag tutorial">Tutorial</span>
-                </div>
-
-                <div className="list-item">
-                  <div className="item-icon alert">
-                    <span className="material-symbols-rounded">timer</span>
-                  </div>
-                  <div className="item-content">
-                    <div className="item-title">Study Group: Algorithms</div>
-                    <div className="item-sub">05:00 PM - Library</div>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="card">
@@ -284,20 +222,15 @@ export default function DashboardApp() {
                   <h3 className="card-title">Recent Resources</h3>
                 </div>
                 <div className="resources">
-                  <div className="resource-card">
-                    <span className="material-symbols-rounded resource-icon pdf">picture_as_pdf</span>
-                    <div>
-                      <div className="resource-title">Algebra_Notes.pdf</div>
-                      <div className="resource-meta">2.4 MB - Just now</div>
+                  {dashboardData?.resources.map((resource: any) => (
+                    <div className="resource-card" key={resource.title}>
+                      <span className={`material-symbols-rounded resource-icon ${resource.iconColor}`}>{resource.icon}</span>
+                      <div>
+                        <div className="resource-title">{resource.title}</div>
+                        <div className="resource-meta">{resource.meta}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="resource-card">
-                    <span className="material-symbols-rounded resource-icon doc">description</span>
-                    <div>
-                      <div className="resource-title">Project_Brief.docx</div>
-                      <div className="resource-meta">500 KB - 2 hrs ago</div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -370,20 +303,15 @@ export default function DashboardApp() {
                   <h3 className="card-title">Online Classmates</h3>
                 </div>
                 <div className="classmate-list">
-                  <div className="classmate-row">
-                    <div className="classmate-avatar felix" />
-                    <div className="classmate-text">
-                      <div className="classmate-name">Francis Tran</div>
-                      <div className="classmate-status online">Studying Biology</div>
+                  {dashboardData?.onlineClassmates.map((classmate: any) => (
+                    <div className="classmate-row" key={classmate.name}>
+                      <div className={`classmate-avatar ${classmate.avatar}`} />
+                      <div className="classmate-text">
+                        <div className="classmate-name">{classmate.name}</div>
+                        <div className={`classmate-status ${classmate.statusColor}`}>{classmate.status}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="classmate-row">
-                    <div className="classmate-avatar eliana" />
-                    <div className="classmate-text">
-                      <div className="classmate-name">Eliana P.</div>
-                      <div className="classmate-status">Idle for 10m</div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>

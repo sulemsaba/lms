@@ -1,5 +1,32 @@
-import { STUDENT_FEATURES } from "@/features/dashboard/DashboardApp";
 import { buildStudentFeaturePaths } from "@/features/auth/roleAccess";
+
+interface StudentFeature {
+    label: string;
+    icon: string;
+    path: string;
+    summary: string;
+}
+
+const STUDENT_FEATURES: StudentFeature[] = [
+    { label: "My Courses", icon: "menu_book", path: "/courses", summary: "Track enrolled courses and materials." },
+    { label: "Assessments", icon: "assignment", path: "/assessments", summary: "Review quizzes and submissions." },
+    { label: "Assignments", icon: "assignment", path: "/assignments", summary: "Manage upcoming coursework deadlines." },
+    { label: "Timetable", icon: "calendar_month", path: "/timetable", summary: "Check lectures and weekly schedule." },
+    { label: "Results", icon: "account_balance", path: "/results", summary: "View grades and performance trends." },
+    { label: "Payments", icon: "receipt_long", path: "/payments", summary: "Track tuition and payment history." },
+    { label: "Community", icon: "forum", path: "/community", summary: "Join discussions and student updates." },
+    { label: "Helpdesk", icon: "support_agent", path: "/helpdesk", summary: "Request academic or technical support." },
+    { label: "Tasks", icon: "checklist", path: "/tasks", summary: "Plan personal and course-related tasks." },
+    { label: "Notes", icon: "edit_note", path: "/notes", summary: "Create and organize study notes." },
+    { label: "Alerts", icon: "notifications", path: "/notifications", summary: "Stay on top of key announcements." },
+    { label: "Queue Manager", icon: "sync", path: "/queue-manager", summary: "Monitor offline sync queue status." },
+    { label: "Focus Mode", icon: "timer", path: "/focus-mode", summary: "Run focused study sessions with timers." },
+    { label: "Resources", icon: "folder_open", path: "/resources", summary: "Access course files and references." },
+    { label: "Study Groups", icon: "group", path: "/study-groups", summary: "Coordinate peer learning sessions." },
+    { label: "Campus Map", icon: "map", path: "/map", summary: "Navigate buildings and learning spaces." },
+    { label: "Search", icon: "search", path: "/search", summary: "Find modules, pages, and resources quickly." },
+    { label: "Profile", icon: "person", path: "/profile", summary: "Manage your student account details." }
+];
 
 export interface DashboardData {
     welcomeMessage: string;
@@ -19,7 +46,7 @@ export interface DashboardData {
 export async function getDashboardData(roleCodes: string[], permissions: string[]): Promise<DashboardData> {
     // Mocking data for now
     const allowedPaths = new Set(buildStudentFeaturePaths(roleCodes, permissions));
-    const visibleStudentFeatures = STUDENT_FEATURES.filter((feature) => allowedPaths.has(feature.path));
+    const visibleStudentFeatures = STUDENT_FEATURES.filter((feature: StudentFeature) => allowedPaths.has(feature.path));
 
     return {
         welcomeMessage: "Welcome back, Suleiman!",
