@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { router } from "@/router";
 import { registerServiceWorker } from "@/services/sync/registerSW";
 import {
@@ -54,5 +55,10 @@ export default function App() {
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </>
+  );
 }
