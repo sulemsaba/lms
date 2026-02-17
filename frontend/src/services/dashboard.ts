@@ -11,6 +11,7 @@ const STUDENT_FEATURES: StudentFeature[] = [
     { label: "My Courses", icon: "menu_book", path: "/courses", summary: "Track enrolled courses and materials." },
     { label: "Assessments", icon: "assignment", path: "/assessments", summary: "Review quizzes and submissions." },
     { label: "Assignments", icon: "assignment", path: "/assignments", summary: "Manage upcoming coursework deadlines." },
+    { label: "QR Scanner", icon: "qr_code_scanner", path: "/qr-scanner", summary: "Scan attendance and event entry codes." },
     { label: "Timetable", icon: "calendar_month", path: "/timetable", summary: "Check lectures and weekly schedule." },
     { label: "Results", icon: "account_balance", path: "/results", summary: "View grades and performance trends." },
     { label: "Payments", icon: "receipt_long", path: "/payments", summary: "Track tuition and payment history." },

@@ -23,6 +23,7 @@ const NotificationsPage = lazy(() => import("@/features/notifications/Notificati
 const QueueManagerPage = lazy(() => import("@/features/offline/QueueManagerPage"));
 const NotesPage = lazy(() => import("@/features/notes/NotesPage"));
 const SearchPage = lazy(() => import("@/features/search/SearchPage"));
+const AttendanceScannerPage = lazy(() => import("@/features/attendance/AttendanceScannerPage"));
 
 const routeLoadingFallback = <div style={{ padding: "16px" }}>Loading...</div>;
 
@@ -50,6 +51,14 @@ export const router = createBrowserRouter([
       { path: "courses", element: withSuspense(<CoursesPage />) },
       { path: "assessments", element: withSuspense(<AssessmentsPage />) },
       { path: "assignments", element: withSuspense(<AssessmentsPage />) },
+      {
+        path: "qr-scanner",
+        element: (
+          <RequireFeatureAccess featurePath="/qr-scanner">
+            {withSuspense(<AttendanceScannerPage />)}
+          </RequireFeatureAccess>
+        )
+      },
       { path: "map", element: withSuspense(<MapPage />) },
       { path: "profile", element: withSuspense(<ProfilePage />) },
       { path: "timetable", element: withSuspense(<TimetablePage />) },

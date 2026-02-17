@@ -154,6 +154,7 @@ export function buildNavItems(roleCodes: string[], permissions: string[]): TabIt
     experience === "admin";
   if (canSeeAssessments) {
     addUnique(items, { label: "Assess", icon: "assignment", path: "/assessments" });
+    addUnique(items, { label: "QR Scanner", icon: "qr_code_scanner", path: "/qr-scanner" });
   }
 
   const canSeeTimetable =
@@ -195,6 +196,7 @@ export function buildStudentFeaturePaths(roleCodes: string[], permissions: strin
 
   if (canSeeAssignments) {
     allowed.add("/assignments");
+    allowed.add("/qr-scanner");
   }
 
   if (canSeeExtendedStudentModules) {

@@ -37,6 +37,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
       { label: "My Courses", icon: "menu_book", path: "/courses" },
       { label: "Assessments", icon: "assignment", path: "/assessments" },
       { label: "Assignments", icon: "assignment", path: "/assignments" },
+      { label: "QR Scanner", icon: "qr_code_scanner", path: "/qr-scanner" },
       { label: "Timetable", icon: "calendar_month", path: "/timetable" },
       { label: "Results", icon: "account_balance", path: "/results" }
     ]
