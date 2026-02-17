@@ -1,4 +1,4 @@
-.dashboard-root {
+.dashboard-page {
   --dashboard-bg: #f2f3f7;
   --dashboard-surface: #ffffff;
   --dashboard-border: #e3e7ef;
@@ -12,28 +12,21 @@
   --dashboard-purple: #8b5cf6;
   --dashboard-pink: #ec4899;
 
-  min-height: 100vh;
-  display: flex;
+  display: grid;
+  gap: 18px;
   background: var(--dashboard-bg);
   color: var(--dashboard-text);
   font-family: "Sora", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  border-radius: 18px;
+  padding: 6px;
 }
 
-.dashboard-root *,
-.dashboard-root *::before,
-.dashboard-root *::after {
+.dashboard-page *,
+.dashboard-page *::before,
+.dashboard-page *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-.dashboard-main {
-  flex: 1;
-  min-width: 0;
-  padding: 24px;
-  display: grid;
-  gap: 18px;
-  overflow: auto;
 }
 
 .dashboard-header {
@@ -507,15 +500,6 @@
   font-size: 13px;
 }
 
-.dashboard-root aside[data-testid="side-nav"] {
-  position: sticky;
-  top: 0;
-  width: 280px;
-  height: 100vh;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
-}
-
 @media (max-width: 1280px) {
   .activity-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -527,18 +511,9 @@
 }
 
 @media (max-width: 960px) {
-  .dashboard-root {
-    flex-direction: column;
-  }
-
-  .dashboard-main {
-    padding: 16px;
-  }
-
-  .dashboard-root aside[data-testid="side-nav"] {
-    position: static;
-    width: 100%;
-    height: auto;
+  .dashboard-page {
+    padding: 0;
+    border-radius: 0;
   }
 
   .dashboard-header {
