@@ -7,6 +7,10 @@ export interface TimetableListItem {
   label: string;
   detail: string;
   cached: boolean;
+  title?: string;
+  startsAt?: string;
+  endsAt?: string;
+  venueLabel?: string;
 }
 
 export interface TimetableFetchResult {
@@ -25,8 +29,22 @@ interface ApiTimetableEvent {
 }
 
 const fallbackEvents: TimetableListItem[] = [
-  { id: "fallback-t1", label: "Monday 10:00", detail: "CS101 - Lecture Hall 1", cached: true },
-  { id: "fallback-t2", label: "Tuesday 14:00", detail: "DB202 - COICT Lab 3", cached: true }
+  {
+    id: "fallback-t1",
+    label: "Monday 10:00",
+    detail: "CS101 - Lecture Hall 1",
+    cached: true,
+    title: "CS101",
+    venueLabel: "Lecture Hall 1"
+  },
+  {
+    id: "fallback-t2",
+    label: "Tuesday 14:00",
+    detail: "DB202 - COICT Lab 3",
+    cached: true,
+    title: "DB202",
+    venueLabel: "COICT Lab 3"
+  }
 ];
 
 function formatEventWindow(startsAt: string): string {
@@ -51,7 +69,11 @@ function toListItem(event: CachedTimetableEvent, cached: boolean): TimetableList
     id: event.id,
     label: formatEventWindow(event.startsAt),
     detail: `${event.title} - ${event.venueLabel}`,
-    cached
+    cached,
+    title: event.title,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+    venueLabel: event.venueLabel
   };
 }
 
