@@ -204,7 +204,7 @@ const toLocalGraphSteps = (
   snappedEnd: [number, number]
 ): string[] => [
   "Route computed from local accessible paths.",
-  `Move from your start point (${origin[0].toFixed(5)}, ${origin[1].toFixed(5)}) to the nearest mapped path node.`,
+  `Move from your start point (${origin[0].toFixed(5)}, ${origin[1].toFixed(5)}) to node (${snappedStart[0].toFixed(5)}, ${snappedStart[1].toFixed(5)}).`,
   `Follow the highlighted path to (${snappedEnd[0].toFixed(5)}, ${snappedEnd[1].toFixed(5)}).`,
   `Proceed to destination (${destination[0].toFixed(5)}, ${destination[1].toFixed(5)}).`
 ];

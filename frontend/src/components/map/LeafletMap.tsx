@@ -5,15 +5,30 @@ import {
   type BuildingOutline,
   type CampusLocation
 } from "@/features/map/campusMapData";
+import { computeLocalRoute, parseGoogleStepInstructions, type NavigationResult } from "@/features/map/navigation";
+import type { MapEntityRef } from "@/features/map/mapSearch";
 import styles from "./LeafletMap.module.css";
+
+export interface MapRouteRequest {
+  origin: [number, number];
+  destination: [number, number];
+  originLabel: string;
+  destinationLabel: string;
+}
+
+export type RouteUpdate =
+  | { status: "ready"; route: NavigationResult }
+  | { status: "error"; error: string };
 
 interface LeafletMapProps {
   center: [number, number];
   locations: CampusLocation[];
-  selectedLocationId: string | null;
+  selectedEntity: MapEntityRef | null;
   buildingOutlines: BuildingOutline[];
   accessibleRoutes: AccessibleRoute[];
-  onSelectLocation: (locationId: string) => void;
+  routeRequest: MapRouteRequest | null;
+  onSelectEntity: (entity: MapEntityRef) => void;
+  onRouteResult: (update: RouteUpdate) => void;
 }
 
 type MapStatus = "idle" | "loading" | "ready" | "error" | "missing-key";
@@ -59,14 +74,20 @@ function loadGoogleMapsApi(apiKey: string): Promise<any> {
 export default function LeafletMap({
   center,
   locations,
-  selectedLocationId,
+  selectedEntity,
   buildingOutlines,
   accessibleRoutes,
-  onSelectLocation
+  routeRequest,
+  onSelectEntity,
+  onRouteResult
 }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
   const overlaysRef = useRef<any[]>([]);
+  const routeOverlayRef = useRef<any>(null);
+  const directionsServiceRef = useRef<any>(null);
+  const routeRequestIdRef = useRef(0);
+  const routeCacheRef = useRef<Map<string, NavigationResult>>(new Map());
   const infoWindowRef = useRef<any>(null);
   const [status, setStatus] = useState<MapStatus>("idle");
   const fallbackEmbedUrl = useMemo(
@@ -81,6 +102,34 @@ export default function LeafletMap({
       }
     }
     overlaysRef.current = [];
+  };
+
+  const clearRouteOverlay = () => {
+    if (routeOverlayRef.current && typeof routeOverlayRef.current.setMap === "function") {
+      routeOverlayRef.current.setMap(null);
+    }
+    routeOverlayRef.current = null;
+  };
+
+  const drawRouteOverlay = (route: NavigationResult) => {
+    const googleApi = (window as GoogleWindow).google;
+    if (!googleApi?.maps || !mapRef.current || route.polyline.length < 2) {
+      return;
+    }
+
+    clearRouteOverlay();
+
+    const routeColor =
+      route.source === "google" ? "#0284c7" : route.source === "local-graph" ? "#166534" : "#c2410c";
+    const routeWeight = route.source === "google" ? 5 : route.source === "local-graph" ? 5 : 4;
+
+    routeOverlayRef.current = new googleApi.maps.Polyline({
+      path: route.polyline.map(([lat, lng]) => ({ lat, lng })),
+      strokeColor: routeColor,
+      strokeOpacity: 0.92,
+      strokeWeight: routeWeight,
+      map: mapRef.current
+    });
   };
 
   useEffect(() => {
@@ -124,8 +173,10 @@ export default function LeafletMap({
     return () => {
       mounted = false;
       clearOverlays();
+      clearRouteOverlay();
       mapRef.current = null;
       infoWindowRef.current = null;
+      directionsServiceRef.current = null;
     };
   }, []);
 
@@ -151,15 +202,17 @@ export default function LeafletMap({
     const infoWindow = infoWindowRef.current;
 
     for (const outline of buildingOutlines) {
+      const isSelected = selectedEntity?.type === "outline" && selectedEntity.id === outline.id;
       const polygon = new googleApi.maps.Polygon({
         paths: outline.path.map(([lat, lng]: [number, number]) => ({ lat, lng })),
-        strokeColor: "#334155",
-        strokeWeight: 1.4,
+        strokeColor: isSelected ? "#0f172a" : "#334155",
+        strokeWeight: isSelected ? 3.1 : 1.4,
         fillColor: "#cbd5e1",
-        fillOpacity: 0.1,
+        fillOpacity: isSelected ? 0.25 : 0.1,
         map
       });
       polygon.addListener("click", (event: any) => {
+        onSelectEntity({ type: "outline", id: outline.id });
         if (!infoWindow) {
           return;
         }
@@ -171,14 +224,16 @@ export default function LeafletMap({
     }
 
     for (const route of accessibleRoutes) {
+      const isSelected = selectedEntity?.type === "route" && selectedEntity.id === route.id;
       const polyline = new googleApi.maps.Polyline({
         path: route.path.map(([lat, lng]: [number, number]) => ({ lat, lng })),
-        strokeColor: "#15803d",
-        strokeOpacity: 0.85,
-        strokeWeight: 4,
+        strokeColor: isSelected ? "#14532d" : "#15803d",
+        strokeOpacity: isSelected ? 0.95 : 0.85,
+        strokeWeight: isSelected ? 6 : 4,
         map
       });
       polyline.addListener("click", (event: any) => {
+        onSelectEntity({ type: "route", id: route.id });
         if (!infoWindow) {
           return;
         }
@@ -191,7 +246,7 @@ export default function LeafletMap({
 
     for (const location of locations) {
       const config = CAMPUS_CATEGORY_CONFIG[location.category];
-      const isSelected = selectedLocationId === location.id;
+      const isSelected = selectedEntity?.type === "location" && selectedEntity.id === location.id;
       const marker = new googleApi.maps.Marker({
         position: { lat: location.position[0], lng: location.position[1] },
         map,
@@ -212,7 +267,7 @@ export default function LeafletMap({
           : "";
 
       marker.addListener("click", () => {
-        onSelectLocation(location.id);
+        onSelectEntity({ type: "location", id: location.id });
         if (infoWindow) {
           infoWindow.setContent(`<strong>${escapeHtml(location.name)}</strong><br/>${escapeHtml(config.label)}${roomPreview}`);
           infoWindow.open({ anchor: marker, map });
@@ -225,14 +280,119 @@ export default function LeafletMap({
     return () => {
       clearOverlays();
     };
-  }, [locations, selectedLocationId, buildingOutlines, accessibleRoutes, onSelectLocation, status]);
+  }, [locations, selectedEntity, buildingOutlines, accessibleRoutes, onSelectEntity, status]);
+
+  useEffect(() => {
+    if (!routeRequest) {
+      clearRouteOverlay();
+      return;
+    }
+
+    const fallbackRoute = computeLocalRoute(routeRequest.origin, routeRequest.destination, {
+      routes: accessibleRoutes
+    });
+    const requestId = routeRequestIdRef.current + 1;
+    routeRequestIdRef.current = requestId;
+
+    if (status === "missing-key") {
+      onRouteResult({
+        status: "ready",
+        route: {
+          ...fallbackRoute,
+          warning:
+            fallbackRoute.warning ??
+            "Google Maps key missing. Showing local in-app route guidance."
+        }
+      });
+      return;
+    }
+
+    if (status === "error") {
+      onRouteResult({
+        status: "ready",
+        route: {
+          ...fallbackRoute,
+          warning:
+            fallbackRoute.warning ??
+            "Google Maps unavailable. Showing local in-app route guidance."
+        }
+      });
+      return;
+    }
+
+    if (status !== "ready") {
+      return;
+    }
+
+    const cacheKey = buildRouteCacheKey(routeRequest);
+    const cachedRoute = routeCacheRef.current.get(cacheKey);
+    if (cachedRoute) {
+      drawRouteOverlay(cachedRoute);
+      onRouteResult({ status: "ready", route: cachedRoute });
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      const googleApi = (window as GoogleWindow).google;
+      if (!googleApi?.maps) {
+        const route = {
+          ...fallbackRoute,
+          warning:
+            fallbackRoute.warning ??
+            "Google Maps unavailable. Showing local in-app route guidance."
+        };
+        drawRouteOverlay(route);
+        onRouteResult({ status: "ready", route });
+        return;
+      }
+
+      directionsServiceRef.current ??= new googleApi.maps.DirectionsService();
+      const service = directionsServiceRef.current;
+      service.route(
+        {
+          origin: { lat: routeRequest.origin[0], lng: routeRequest.origin[1] },
+          destination: { lat: routeRequest.destination[0], lng: routeRequest.destination[1] },
+          travelMode: googleApi.maps.TravelMode.WALKING
+        },
+        (response: any, directionsStatus: string) => {
+          if (routeRequestIdRef.current !== requestId) {
+            return;
+          }
+
+          if (directionsStatus === "OK") {
+            const route = toGoogleNavigationResult(response);
+            if (route) {
+              routeCacheRef.current.set(cacheKey, route);
+              drawRouteOverlay(route);
+              onRouteResult({ status: "ready", route });
+              return;
+            }
+          }
+
+          const fallbackWarning = describeDirectionsFailure(directionsStatus);
+          const route = {
+            ...fallbackRoute,
+            warning: fallbackRoute.warning
+              ? `${fallbackRoute.warning} ${fallbackWarning}`
+              : `${fallbackWarning} Using local in-app guidance.`
+          };
+          drawRouteOverlay(route);
+          onRouteResult({ status: "ready", route });
+        }
+      );
+    }, 220);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [accessibleRoutes, onRouteResult, routeRequest, status]);
 
   if (!GOOGLE_MAPS_KEY) {
     return (
       <div className={styles.mapFallback} data-testid="leaflet-map">
         <p className={styles.mapNotice}>
-          Google Maps API key missing. Showing embedded Google Map fallback. Set <code>VITE_GOOGLE_MAPS_API_KEY</code>{" "}
-          to enable interactive overlays.
+          Google Maps API key missing. Showing embedded Google Map fallback. In-app route guidance still runs with local
+          fallback logic.
         </p>
         <iframe title="Campus map fallback" src={fallbackEmbedUrl} className={styles.mapFrame} loading="lazy" />
       </div>
@@ -260,3 +420,59 @@ const escapeHtml = (input: string): string =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+
+const buildRouteCacheKey = (request: MapRouteRequest): string =>
+  [
+    request.origin[0].toFixed(6),
+    request.origin[1].toFixed(6),
+    request.destination[0].toFixed(6),
+    request.destination[1].toFixed(6)
+  ].join(":");
+
+const toGoogleNavigationResult = (response: any): NavigationResult | null => {
+  const selectedRoute = response?.routes?.[0];
+  const legs: any[] = selectedRoute?.legs ?? [];
+  const path: [number, number][] =
+    selectedRoute?.overview_path?.map((point: { lat: () => number; lng: () => number }) => [point.lat(), point.lng()]) ??
+    [];
+
+  if (!selectedRoute || path.length < 2) {
+    return null;
+  }
+
+  const steps = legs
+    .flatMap((leg) =>
+      (leg.steps ?? [])
+        .map((step: any) => parseGoogleStepInstructions((step.instructions as string | undefined) ?? ""))
+        .filter(Boolean)
+    )
+    .slice(0, 8);
+
+  const distanceMeters = legs.reduce((sum, leg) => sum + Number((leg.distance?.value as number | undefined) ?? 0), 0);
+  const durationSeconds = legs.reduce((sum, leg) => sum + Number((leg.duration?.value as number | undefined) ?? 0), 0);
+  const etaMinutes = Math.max(1, Math.round((durationSeconds > 0 ? durationSeconds : distanceMeters / 1.25) / 60));
+
+  return {
+    source: "google",
+    polyline: path,
+    steps: steps.length > 0 ? steps : ["Follow the highlighted walking route to your destination."],
+    distanceMeters,
+    etaMinutes
+  };
+};
+
+const describeDirectionsFailure = (status: string): string => {
+  if (status === "OVER_QUERY_LIMIT") {
+    return "Google route quota exceeded.";
+  }
+  if (status === "REQUEST_DENIED") {
+    return "Google route request denied.";
+  }
+  if (status === "ZERO_RESULTS") {
+    return "No Google walking route available.";
+  }
+  if (status === "INVALID_REQUEST") {
+    return "Google route request was invalid.";
+  }
+  return "Google route unavailable.";
+};

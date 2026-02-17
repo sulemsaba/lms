@@ -115,6 +115,70 @@
   color: var(--color-primary);
 }
 
+.originCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-elevated);
+  padding: var(--spacing-sm);
+  display: grid;
+  gap: var(--spacing-xs);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+.originCard h4 {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.originSearchField {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: 0 10px;
+  min-height: 42px;
+  background: var(--color-surface);
+}
+
+.originSearchField input {
+  border: none;
+  outline: none;
+  background: transparent;
+  min-height: 38px;
+  width: 100%;
+  color: var(--color-text-primary);
+}
+
+.originList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.originButton {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  min-height: 34px;
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.originButton:hover {
+  border-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.originButtonActive {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
 .mapLayout {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);

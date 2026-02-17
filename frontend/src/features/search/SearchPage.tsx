@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
+import {
+  CAMPUS_ACCESSIBLE_ROUTES,
+  CAMPUS_BUILDING_OUTLINES,
+  enrichWithNetworkVenues
+} from "@/features/map/campusMapData";
+import { buildMapEntityIndex, encodeMapEntityRef, mapEntityKey, searchMapEntities } from "@/features/map/mapSearch";
 import { db } from "@/services/db";
 import styles from "./SearchPage.module.css";
 
@@ -19,7 +25,7 @@ interface SearchResultGroups {
   tasks: SearchResultItem[];
   notes: SearchResultItem[];
   notifications: SearchResultItem[];
-  venues: SearchResultItem[];
+  mapAreas: SearchResultItem[];
 }
 
 interface ModuleIndexEntry extends SearchResultItem {
@@ -95,7 +101,7 @@ const moduleIndex: ModuleIndexEntry[] = [
     title: "Campus Map",
     subtitle: "Venues, campuses, and routes",
     path: "/map",
-    keywords: "map navigation venues"
+    keywords: "map navigation venues routes"
   },
   {
     id: "module-profile",
@@ -113,8 +119,10 @@ const emptyGroups: SearchResultGroups = {
   tasks: [],
   notes: [],
   notifications: [],
-  venues: []
+  mapAreas: []
 };
+
+const SEARCH_DEBOUNCE_MS = 200;
 
 function includesQuery(values: string[], query: string): boolean {
   const haystack = values.join(" ").toLowerCase();
@@ -125,13 +133,33 @@ function limit<T>(items: T[], maxItems = 8): T[] {
   return items.slice(0, maxItems);
 }
 
+const mapEntityTypeLabel = (type: string): string => {
+  if (type === "location") {
+    return "Location";
+  }
+  if (type === "outline") {
+    return "Building Outline";
+  }
+  return "Accessible Route";
+};
+
 /**
  * Unified local-first search across core LMS modules.
  */
 export default function SearchPage() {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [groups, setGroups] = useState<SearchResultGroups>(emptyGroups);
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = debouncedQuery.trim().toLowerCase();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedQuery(query);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [query]);
 
   useEffect(() => {
     let mounted = true;
@@ -156,6 +184,26 @@ export default function SearchPage() {
         db.notifications.toArray(),
         db.venues.toArray()
       ]);
+
+      const mapEntities = buildMapEntityIndex(
+        enrichWithNetworkVenues(venues),
+        CAMPUS_BUILDING_OUTLINES,
+        CAMPUS_ACCESSIBLE_ROUTES
+      );
+
+      const mapAreaResults = searchMapEntities(normalizedQuery, mapEntities, { category: "all", limit: 10 }).map(
+        (entity) => {
+          const nextParams = new URLSearchParams();
+          nextParams.set("q", normalizedQuery);
+          nextParams.set("focus", encodeMapEntityRef(entity.ref));
+          return {
+            id: `map-area-${mapEntityKey(entity.ref)}`,
+            title: entity.title,
+            subtitle: `${mapEntityTypeLabel(entity.ref.type)} • ${entity.subtitle}`,
+            path: `/map?${nextParams.toString()}`
+          };
+        }
+      );
 
       const nextGroups: SearchResultGroups = {
         modules: limit(
@@ -213,16 +261,7 @@ export default function SearchPage() {
               path: "/notifications"
             }))
         ),
-        venues: limit(
-          venues
-            .filter((item) => includesQuery([item.name, item.campus], normalizedQuery))
-            .map((item) => ({
-              id: `venue-${item.id}`,
-              title: item.name,
-              subtitle: `Campus: ${item.campus}`,
-              path: "/map"
-            }))
-        )
+        mapAreas: mapAreaResults
       };
 
       if (mounted) {
@@ -245,7 +284,7 @@ export default function SearchPage() {
       groups.tasks.length +
       groups.notes.length +
       groups.notifications.length +
-      groups.venues.length,
+      groups.mapAreas.length,
     [groups]
   );
 
@@ -258,7 +297,7 @@ export default function SearchPage() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search modules, courses, tasks, notes..."
+            placeholder="Search modules, courses, map areas, tasks, notes..."
             aria-label="Global search"
           />
           <Badge color="accent" text={`${totalMatches} match${totalMatches === 1 ? "" : "es"}`} />
@@ -271,7 +310,7 @@ export default function SearchPage() {
       <SearchSection title="Tasks" items={groups.tasks} emptyLabel="No task matches." />
       <SearchSection title="Study Notes" items={groups.notes} emptyLabel="No note matches." />
       <SearchSection title="Notifications" items={groups.notifications} emptyLabel="No notification matches." />
-      <SearchSection title="Venues" items={groups.venues} emptyLabel="No venue matches." />
+      <SearchSection title="Map Areas" items={groups.mapAreas} emptyLabel="No map area matches." />
     </section>
   );
 }

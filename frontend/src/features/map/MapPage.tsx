@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import LeafletMap from "@/components/map/LeafletMap";
-import RouteDisplay from "@/components/map/RouteDisplay";
+import { useSearchParams } from "react-router-dom";
+import LeafletMap, { type MapRouteRequest, type RouteUpdate } from "@/components/map/LeafletMap";
+import RouteDisplay, { type RouteDisplayModel } from "@/components/map/RouteDisplay";
 import SkeletonLoader from "@/components/ui/SkeletonLoader";
 import { fetchVenues } from "@/services/api/venuesApi";
 import {
@@ -14,11 +15,22 @@ import {
   type CampusLocation,
   type FloorSpaceKind
 } from "@/features/map/campusMapData";
+import {
+  buildMapEntityIndex,
+  decodeMapEntityRef,
+  encodeMapEntityRef,
+  mapEntityKey,
+  searchMapEntities,
+  type MapEntityRef,
+  type MapSearchEntity
+} from "@/features/map/mapSearch";
 import styles from "./MapPage.module.css";
 
 type CategoryFilter = "all" | CampusCategory;
 
 const CATEGORY_FILTERS: CategoryFilter[] = ["all", ...CAMPUS_CATEGORY_ORDER];
+const SEARCH_DEBOUNCE_MS = 200;
+const SEARCH_RESULT_LIMIT = 140;
 
 const FLOOR_SPACE_KIND_LABEL: Record<FloorSpaceKind, string> = {
   classroom: "Classroom",
@@ -31,29 +43,13 @@ const FLOOR_SPACE_KIND_LABEL: Record<FloorSpaceKind, string> = {
   entrance: "Entrance"
 };
 
-const locationMatchesQuery = (location: CampusLocation, normalizedQuery: string): boolean => {
-  if (!normalizedQuery) {
-    return true;
-  }
+const DEFAULT_ROUTE_STEPS = [
+  "Search and select a destination from the map entities list.",
+  "Set route origin from GPS or choose a known campus location.",
+  "Route guidance will stay inside this map and fallback locally if Google routing fails."
+];
 
-  const categoryLabel = CAMPUS_CATEGORY_CONFIG[location.category].label;
-  const floorLabels = (location.floorPlans ?? []).flatMap((floor) => floor.spaces.map((space) => space.label));
-
-  const searchableTokens = [
-    location.name,
-    location.building ?? "",
-    location.description ?? "",
-    location.openingHours ?? "",
-    categoryLabel,
-    ...(location.roomNumbers ?? []),
-    ...(location.facilities ?? []),
-    ...(location.menuPreview ?? []),
-    ...(location.accessibilityNotes ?? []),
-    ...floorLabels
-  ];
-
-  return searchableTokens.some((token) => token.toLowerCase().includes(normalizedQuery));
-};
+const normalizeText = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, " ");
 
 const toRadians = (value: number): number => (value * Math.PI) / 180;
 
@@ -69,39 +65,45 @@ const calculateDistanceMeters = (left: [number, number], right: [number, number]
   return earthRadiusMeters * angularDistance;
 };
 
-const buildRouteSteps = (location: CampusLocation | null): string[] => {
-  if (!location) {
-    return [
-      "Select a campus location from the list or map.",
-      "Use category filters to focus on the facilities you need.",
-      "Accessible routes are highlighted in green on the map."
-    ];
+const getEntityIcon = (entity: MapSearchEntity, locationsById: Map<string, CampusLocation>): string => {
+  if (entity.ref.type === "location") {
+    const location = locationsById.get(entity.ref.id);
+    if (location) {
+      return CAMPUS_CATEGORY_CONFIG[location.category].icon;
+    }
+    return "place";
   }
+  return entity.ref.type === "outline" ? "domain" : "route";
+};
 
-  const destinationLabel = location.building ? `${location.name} (${location.building})` : location.name;
-  const roomHint = location.roomNumbers?.[0] ? `Proceed to ${location.roomNumbers[0]}.` : "Proceed to the main reception point.";
-
-  return [
-    `Start at Mlimani Gate and head toward ${destinationLabel}.`,
-    "Follow walkways shown on the map and remain on marked pedestrian lanes.",
-    roomHint
-  ];
+const findMainGateLocation = (locations: CampusLocation[]): CampusLocation | null => {
+  const mainGate =
+    locations.find((location) => normalizeText(location.name).includes("main gate")) ??
+    locations.find((location) => normalizeText(location.name).includes("gate"));
+  return mainGate ?? locations[0] ?? null;
 };
 
 /**
- * Campus map and route experience.
+ * Campus map and route experience with unified in-map search and navigation.
  */
 export default function MapPage() {
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [queryInput, setQueryInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [loading, setLoading] = useState(true);
   const [sourceLabel, setSourceLabel] = useState("");
   const [networkVenues, setNetworkVenues] = useState<ReturnType<typeof enrichWithNetworkVenues>>([]);
-  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedFloorId, setSelectedFloorId] = useState<string | null>(null);
+  const [originLocationId, setOriginLocationId] = useState<string | null>(null);
+  const [originQuery, setOriginQuery] = useState("");
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [locationFeedback, setLocationFeedback] = useState("");
-  const [shareFeedback, setShareFeedback] = useState("");
+  const [externalFeedback, setExternalFeedback] = useState("");
+  const [routeDisplay, setRouteDisplay] = useState<RouteDisplayModel>({
+    status: "idle",
+    steps: DEFAULT_ROUTE_STEPS
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -110,7 +112,8 @@ export default function MapPage() {
       if (!mounted) {
         return;
       }
-      setNetworkVenues(enrichWithNetworkVenues(result.venues));
+      const locations = enrichWithNetworkVenues(result.venues);
+      setNetworkVenues(locations);
       if (result.source === "cache") {
         setSourceLabel("Showing cached venues (offline mode).");
       } else if (result.source === "fallback") {
@@ -126,33 +129,92 @@ export default function MapPage() {
     };
   }, []);
 
-  const normalizedQuery = query.trim().toLowerCase();
-
-  const filteredLocations = useMemo(
-    () =>
-      networkVenues.filter((location) => {
-        if (activeCategory !== "all" && location.category !== activeCategory) {
-          return false;
-        }
-        return locationMatchesQuery(location, normalizedQuery);
-      }),
-    [activeCategory, networkVenues, normalizedQuery]
-  );
+  useEffect(() => {
+    const queryFromUrl = searchParams.get("q") ?? "";
+    if (queryFromUrl !== queryInput) {
+      setQueryInput(queryFromUrl);
+    }
+  }, [queryInput, searchParams]);
 
   useEffect(() => {
-    if (!selectedLocationId && filteredLocations.length > 0) {
-      setSelectedLocationId(filteredLocations[0].id);
-      return;
-    }
-    if (selectedLocationId && !filteredLocations.some((location) => location.id === selectedLocationId)) {
-      setSelectedLocationId(filteredLocations[0]?.id ?? null);
-    }
-  }, [filteredLocations, selectedLocationId]);
+    const timer = window.setTimeout(() => {
+      setDebouncedQuery(queryInput);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [queryInput]);
 
-  const selectedLocation = useMemo(
-    () => filteredLocations.find((location) => location.id === selectedLocationId) ?? null,
-    [filteredLocations, selectedLocationId]
+  const locationsById = useMemo(() => new Map(networkVenues.map((location) => [location.id, location])), [networkVenues]);
+  const mainGateLocation = useMemo(() => findMainGateLocation(networkVenues), [networkVenues]);
+
+  useEffect(() => {
+    if (!originLocationId && mainGateLocation) {
+      setOriginLocationId(mainGateLocation.id);
+      setOriginQuery(mainGateLocation.name);
+    }
+  }, [mainGateLocation, originLocationId]);
+
+  const entityIndex = useMemo(
+    () => buildMapEntityIndex(networkVenues, CAMPUS_BUILDING_OUTLINES, CAMPUS_ACCESSIBLE_ROUTES),
+    [networkVenues]
   );
+
+  const entitiesByKey = useMemo(
+    () => new Map(entityIndex.map((entity) => [mapEntityKey(entity.ref), entity])),
+    [entityIndex]
+  );
+
+  const filteredEntities = useMemo(
+    () => searchMapEntities(debouncedQuery, entityIndex, { category: activeCategory, limit: SEARCH_RESULT_LIMIT }),
+    [activeCategory, debouncedQuery, entityIndex]
+  );
+
+  const focusedEntityFromUrl = useMemo(
+    () => decodeMapEntityRef(searchParams.get("focus")),
+    [searchParams]
+  );
+
+  const focusedEntity = useMemo(() => {
+    if (!focusedEntityFromUrl) {
+      return null;
+    }
+    return entitiesByKey.get(mapEntityKey(focusedEntityFromUrl)) ?? null;
+  }, [entitiesByKey, focusedEntityFromUrl]);
+
+  const selectedEntity = useMemo(() => {
+    if (!focusedEntity) {
+      return filteredEntities[0] ?? null;
+    }
+    const existsInFiltered = filteredEntities.some(
+      (entity) => mapEntityKey(entity.ref) === mapEntityKey(focusedEntity.ref)
+    );
+    if (existsInFiltered) {
+      return focusedEntity;
+    }
+    return filteredEntities[0] ?? focusedEntity;
+  }, [filteredEntities, focusedEntity]);
+
+  const selectedLocation = useMemo(() => {
+    if (!selectedEntity || selectedEntity.ref.type !== "location") {
+      return null;
+    }
+    return locationsById.get(selectedEntity.ref.id) ?? null;
+  }, [locationsById, selectedEntity]);
+
+  const selectedOutline = useMemo(() => {
+    if (!selectedEntity || selectedEntity.ref.type !== "outline") {
+      return null;
+    }
+    return CAMPUS_BUILDING_OUTLINES.find((outline) => outline.id === selectedEntity.ref.id) ?? null;
+  }, [selectedEntity]);
+
+  const selectedRoute = useMemo(() => {
+    if (!selectedEntity || selectedEntity.ref.type !== "route") {
+      return null;
+    }
+    return CAMPUS_ACCESSIBLE_ROUTES.find((route) => route.id === selectedEntity.ref.id) ?? null;
+  }, [selectedEntity]);
 
   useEffect(() => {
     const floors = selectedLocation?.floorPlans ?? [];
@@ -163,7 +225,7 @@ export default function MapPage() {
     if (!selectedFloorId || !floors.some((floor) => floor.id === selectedFloorId)) {
       setSelectedFloorId(floors[0].id);
     }
-  }, [selectedLocation, selectedFloorId]);
+  }, [selectedFloorId, selectedLocation]);
 
   const selectedFloor = useMemo(() => {
     if (!selectedLocation?.floorPlans || selectedLocation.floorPlans.length === 0) {
@@ -172,15 +234,104 @@ export default function MapPage() {
     return selectedLocation.floorPlans.find((floor) => floor.id === selectedFloorId) ?? selectedLocation.floorPlans[0];
   }, [selectedFloorId, selectedLocation]);
 
-  const selectedMapCenter = selectedLocation?.position ?? CAMPUS_CENTER;
-  const mapCenter = userLocation ?? selectedMapCenter;
+  const visibleLocations = useMemo(() => {
+    const allowedLocationIds = new Set(
+      filteredEntities.filter((entity) => entity.ref.type === "location").map((entity) => entity.ref.id)
+    );
+    return networkVenues.filter((location) => allowedLocationIds.has(location.id));
+  }, [filteredEntities, networkVenues]);
 
-  const routeSteps = useMemo(() => buildRouteSteps(selectedLocation), [selectedLocation]);
+  const selectedOriginLocation = useMemo(() => {
+    if (originLocationId) {
+      return locationsById.get(originLocationId) ?? null;
+    }
+    return mainGateLocation;
+  }, [locationsById, mainGateLocation, originLocationId]);
 
-  const onSelectLocation = useCallback((locationId: string) => {
-    setSelectedLocationId(locationId);
-    setUserLocation(null);
-  }, []);
+  const routeOrigin = userLocation ?? selectedOriginLocation?.position ?? CAMPUS_CENTER;
+  const routeOriginLabel = userLocation ? "Current GPS location" : selectedOriginLocation?.name ?? "Main Gate";
+  const routeDestination = selectedEntity?.anchor ?? null;
+
+  const routeRequest = useMemo<MapRouteRequest | null>(() => {
+    if (!routeDestination) {
+      return null;
+    }
+    return {
+      origin: routeOrigin,
+      destination: routeDestination,
+      originLabel: routeOriginLabel,
+      destinationLabel: selectedEntity?.title ?? "Destination"
+    };
+  }, [routeDestination, routeOrigin, routeOriginLabel, selectedEntity?.title]);
+
+  const routeRequestKey = useMemo(() => {
+    if (!routeRequest) {
+      return "";
+    }
+    return [
+      routeRequest.origin[0].toFixed(6),
+      routeRequest.origin[1].toFixed(6),
+      routeRequest.destination[0].toFixed(6),
+      routeRequest.destination[1].toFixed(6)
+    ].join(":");
+  }, [routeRequest]);
+
+  useEffect(() => {
+    if (!routeRequest) {
+      setRouteDisplay({ status: "idle", steps: DEFAULT_ROUTE_STEPS });
+      return;
+    }
+    setRouteDisplay((current) => ({
+      status: "loading",
+      steps: current.steps.length > 0 ? current.steps : ["Calculating route..."]
+    }));
+  }, [routeRequestKey]);
+
+  const updateQueryParam = useCallback(
+    (value: string) => {
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          if (value.trim()) {
+            next.set("q", value);
+          } else {
+            next.delete("q");
+          }
+          return next;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
+  const onQueryChange = useCallback(
+    (value: string) => {
+      setQueryInput(value);
+      updateQueryParam(value);
+    },
+    [updateQueryParam]
+  );
+
+  const onSelectEntity = useCallback(
+    (ref: MapEntityRef) => {
+      setExternalFeedback("");
+      setSearchParams(
+        (current) => {
+          const next = new URLSearchParams(current);
+          next.set("focus", encodeMapEntityRef(ref));
+          if (queryInput.trim()) {
+            next.set("q", queryInput);
+          } else {
+            next.delete("q");
+          }
+          return next;
+        },
+        { replace: false }
+      );
+    },
+    [queryInput, setSearchParams]
+  );
 
   const findNearestLocation = useCallback(
     (position: [number, number]): CampusLocation | null =>
@@ -196,7 +347,7 @@ export default function MapPage() {
 
   const onLocateMe = useCallback(async () => {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLocationFeedback("Location services are unavailable in this browser.");
+      setLocationFeedback("Location services are unavailable in this browser. Using selected origin instead.");
       return;
     }
 
@@ -207,67 +358,102 @@ export default function MapPage() {
           setUserLocation(coords);
           const nearest = findNearestLocation(coords);
           if (nearest) {
-            setSelectedLocationId(nearest.id);
-            setLocationFeedback(`Centered on your location. Nearest stop: ${nearest.name}.`);
+            setLocationFeedback(`Using GPS origin. Nearest known point: ${nearest.name}.`);
           } else {
-            setLocationFeedback("Centered on your current location.");
+            setLocationFeedback("Using GPS origin.");
           }
           resolve();
         },
         () => {
-          setLocationFeedback("Unable to read your location. Allow GPS permission and try again.");
+          setUserLocation(null);
+          if (mainGateLocation) {
+            setOriginLocationId(mainGateLocation.id);
+            setOriginQuery(mainGateLocation.name);
+          }
+          setLocationFeedback("GPS unavailable or denied. Using Main Gate origin. You can pick another origin below.");
           resolve();
         },
         { enableHighAccuracy: true, timeout: 10_000, maximumAge: 45_000 }
       );
     });
-  }, [findNearestLocation]);
+  }, [findNearestLocation, mainGateLocation]);
 
-  const onCenterDestination = useCallback(() => {
+  const onUseMainGateOrigin = useCallback(() => {
+    if (!mainGateLocation) {
+      return;
+    }
     setUserLocation(null);
-    if (selectedLocation) {
-      setLocationFeedback(`Centered on ${selectedLocation.name}.`);
+    setOriginLocationId(mainGateLocation.id);
+    setOriginQuery(mainGateLocation.name);
+    setLocationFeedback(`Route origin set to ${mainGateLocation.name}.`);
+  }, [mainGateLocation]);
+
+  const onRouteResult = useCallback((update: RouteUpdate) => {
+    if (update.status === "error") {
+      setRouteDisplay({
+        status: "error",
+        steps: ["Unable to compute a route for the current selection."],
+        error: update.error
+      });
       return;
     }
-    setLocationFeedback("Centered on default campus view.");
-  }, [selectedLocation]);
 
-  const onShareLocation = useCallback(async () => {
-    const targetPoint = userLocation ?? selectedLocation?.position ?? null;
-    if (!targetPoint) {
-      setShareFeedback("Select a location first, then share.");
+    setRouteDisplay({
+      status: "ready",
+      source: update.route.source,
+      distanceMeters: update.route.distanceMeters,
+      etaMinutes: update.route.etaMinutes,
+      steps: update.route.steps,
+      warning: update.route.warning
+    });
+  }, []);
+
+  const onOpenExternalRoute = useCallback(() => {
+    if (!routeRequest) {
+      setExternalFeedback("Select a destination to open external routing.");
+      return;
+    }
+    const origin = `${routeRequest.origin[0]},${routeRequest.origin[1]}`;
+    const destination = `${routeRequest.destination[0]},${routeRequest.destination[1]}`;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=walking`;
+
+    if (typeof window === "undefined") {
+      setExternalFeedback(url);
       return;
     }
 
-    const locationLabel = selectedLocation?.name ?? "My current campus location";
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${targetPoint[0]},${targetPoint[1]}`;
-
-    if (typeof navigator !== "undefined" && "share" in navigator) {
-      try {
-        await navigator.share({
-          title: "UDSM Location Share",
-          text: locationLabel,
-          url: mapUrl
-        });
-        setShareFeedback("Location shared.");
-        return;
-      } catch {
-        // Continue with clipboard fallback if user cancels or share is unavailable.
-      }
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (opened) {
+      setExternalFeedback("Opened Google Maps route in a new tab.");
+      return;
     }
+    setExternalFeedback(`Popup blocked. Open manually: ${url}`);
+  }, [routeRequest]);
 
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      try {
-        await navigator.clipboard.writeText(`${locationLabel}: ${mapUrl}`);
-        setShareFeedback("Location link copied to clipboard.");
-        return;
-      } catch {
-        // Fallback to plain text response if clipboard access fails.
-      }
+  const normalizedOriginQuery = normalizeText(originQuery);
+  const originCandidates = useMemo(() => {
+    if (!normalizedOriginQuery) {
+      return networkVenues.slice(0, 8);
     }
+    return networkVenues
+      .filter((location) => {
+        const haystack = `${location.name} ${location.building ?? ""}`.toLowerCase();
+        return haystack.includes(normalizedOriginQuery);
+      })
+      .slice(0, 8);
+  }, [networkVenues, normalizedOriginQuery]);
 
-    setShareFeedback(`Share this link: ${mapUrl}`);
-  }, [selectedLocation, userLocation]);
+  const onPickOrigin = useCallback(
+    (location: CampusLocation) => {
+      setOriginLocationId(location.id);
+      setUserLocation(null);
+      setOriginQuery(location.name);
+      setLocationFeedback(`Route origin set to ${location.name}.`);
+    },
+    []
+  );
+
+  const mapCenter = selectedEntity?.anchor ?? routeOrigin ?? CAMPUS_CENTER;
 
   if (loading) {
     return <SkeletonLoader type="card" />;
@@ -280,14 +466,14 @@ export default function MapPage() {
           <span className={`material-symbols-rounded ${styles.searchIcon}`}>search</span>
           <input
             className={styles.input}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search building, room, or facility"
-            aria-label="Search campus locations"
+            value={queryInput}
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder="Search location, route, outline, room, or facility"
+            aria-label="Search campus map entities"
           />
         </label>
-        {query ? (
-          <button type="button" className={styles.clearButton} onClick={() => setQuery("")}>
+        {queryInput ? (
+          <button type="button" className={styles.clearButton} onClick={() => onQueryChange("")}>
             Clear
           </button>
         ) : null}
@@ -316,29 +502,57 @@ export default function MapPage() {
       <div className={styles.quickActions} role="group" aria-label="Map quick actions">
         <button type="button" className={styles.quickActionButton} onClick={() => void onLocateMe()}>
           <span className="material-symbols-rounded">my_location</span>
-          <span>Locate Me</span>
+          <span>Use GPS Origin</span>
         </button>
-        <button type="button" className={styles.quickActionButton} onClick={() => onCenterDestination()}>
-          <span className="material-symbols-rounded">center_focus_strong</span>
-          <span>Center Destination</span>
+        <button type="button" className={styles.quickActionButton} onClick={onUseMainGateOrigin}>
+          <span className="material-symbols-rounded">gate</span>
+          <span>Use Main Gate</span>
         </button>
-        <button type="button" className={styles.quickActionButton} onClick={() => void onShareLocation()}>
-          <span className="material-symbols-rounded">share_location</span>
-          <span>Share Location</span>
+        <button type="button" className={styles.quickActionButton} onClick={onOpenExternalRoute}>
+          <span className="material-symbols-rounded">open_in_new</span>
+          <span>Open Google Route</span>
         </button>
       </div>
       {locationFeedback ? <p className={styles.hint}>{locationFeedback}</p> : null}
-      {shareFeedback ? <p className={styles.hint}>{shareFeedback}</p> : null}
+      {externalFeedback ? <p className={styles.hint}>{externalFeedback}</p> : null}
+
+      <div className={styles.originCard}>
+        <h4>Route Origin</h4>
+        <p className={styles.hint}>Current origin: {routeOriginLabel}</p>
+        <label className={styles.originSearchField}>
+          <span className="material-symbols-rounded">pin_drop</span>
+          <input
+            value={originQuery}
+            onChange={(event) => setOriginQuery(event.target.value)}
+            placeholder="Search origin location"
+            aria-label="Search route origin"
+          />
+        </label>
+        <div className={styles.originList}>
+          {originCandidates.map((location) => (
+            <button
+              key={location.id}
+              type="button"
+              className={`${styles.originButton} ${originLocationId === location.id && !userLocation ? styles.originButtonActive : ""}`.trim()}
+              onClick={() => onPickOrigin(location)}
+            >
+              {location.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className={styles.mapLayout}>
         <div className={styles.mapCard}>
           <LeafletMap
             center={mapCenter}
-            locations={filteredLocations}
-            selectedLocationId={selectedLocationId}
+            locations={visibleLocations}
+            selectedEntity={selectedEntity?.ref ?? null}
             buildingOutlines={CAMPUS_BUILDING_OUTLINES}
             accessibleRoutes={CAMPUS_ACCESSIBLE_ROUTES}
-            onSelectLocation={onSelectLocation}
+            routeRequest={routeRequest}
+            onSelectEntity={onSelectEntity}
+            onRouteResult={onRouteResult}
           />
           <div className={styles.legend}>
             {CAMPUS_CATEGORY_ORDER.map((category) => {
@@ -356,9 +570,15 @@ export default function MapPage() {
 
         <aside className={styles.sidePanel}>
           <div className={styles.panelHeader}>
-            <h3>{selectedLocation?.name ?? "No location selected"}</h3>
-            {selectedLocation ? (
-              <span className={styles.categoryTag}>{CAMPUS_CATEGORY_CONFIG[selectedLocation.category].label}</span>
+            <h3>{selectedEntity?.title ?? "No destination selected"}</h3>
+            {selectedEntity ? (
+              <span className={styles.categoryTag}>
+                {selectedEntity.ref.type === "location"
+                  ? CAMPUS_CATEGORY_CONFIG[selectedLocation?.category ?? "academic"].label
+                  : selectedEntity.ref.type === "outline"
+                    ? "Building Outline"
+                    : "Accessible Route"}
+              </span>
             ) : null}
           </div>
 
@@ -452,44 +672,63 @@ export default function MapPage() {
                 </div>
               ) : null}
             </>
+          ) : selectedOutline ? (
+            <>
+              <p className={styles.description}>Building footprint overlay for map orientation and quick area selection.</p>
+              <p className={styles.metaLine}>
+                <span className="material-symbols-rounded">square_foot</span>
+                {selectedOutline.path.length} outline points
+              </p>
+            </>
+          ) : selectedRoute ? (
+            <>
+              <p className={styles.description}>Accessible pathway segment highlighted on the map.</p>
+              <p className={styles.metaLine}>
+                <span className="material-symbols-rounded">footprint</span>
+                {selectedRoute.path.length} path nodes
+              </p>
+              <p className={styles.metaLine}>
+                <span className="material-symbols-rounded">accessible</span>
+                {selectedRoute.accessible === false ? "Restricted" : "Accessible"}
+              </p>
+            </>
           ) : (
-            <p className={styles.emptyState}>Use search and filters to find a location.</p>
+            <p className={styles.emptyState}>Use search and filters to find a destination.</p>
           )}
         </aside>
       </div>
 
       <div className={styles.locationListCard}>
         <div className={styles.locationListHeader}>
-          <h3>Campus Locations</h3>
-          <p>{filteredLocations.length} results</p>
+          <h3>Map Search Results</h3>
+          <p>{filteredEntities.length} results</p>
         </div>
-        {filteredLocations.length > 0 ? (
+        {filteredEntities.length > 0 ? (
           <div className={styles.locationList}>
-            {filteredLocations.map((location) => {
-              const config = CAMPUS_CATEGORY_CONFIG[location.category];
-              const active = selectedLocationId === location.id;
+            {filteredEntities.map((entity) => {
+              const active = selectedEntity ? mapEntityKey(selectedEntity.ref) === mapEntityKey(entity.ref) : false;
               return (
                 <button
-                  key={location.id}
+                  key={mapEntityKey(entity.ref)}
                   type="button"
                   className={`${styles.locationRow} ${active ? styles.locationRowActive : ""}`.trim()}
-                  onClick={() => setSelectedLocationId(location.id)}
+                  onClick={() => onSelectEntity(entity.ref)}
                 >
-                  <span className="material-symbols-rounded">{config.icon}</span>
+                  <span className="material-symbols-rounded">{getEntityIcon(entity, locationsById)}</span>
                   <span className={styles.locationText}>
-                    <strong>{location.name}</strong>
-                    <small>{location.building ?? config.label}</small>
+                    <strong>{entity.title}</strong>
+                    <small>{entity.subtitle}</small>
                   </span>
                 </button>
               );
             })}
           </div>
         ) : (
-          <p className={styles.emptyState}>No locations match your current search and filter.</p>
+          <p className={styles.emptyState}>No map entities match your current search and filter.</p>
         )}
       </div>
 
-      <RouteDisplay steps={routeSteps} />
+      <RouteDisplay route={routeDisplay} />
     </section>
   );
 }
