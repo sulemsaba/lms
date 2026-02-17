@@ -24,12 +24,12 @@ const SOURCE_LABEL: Record<RouteSource, string> = {
 };
 
 /**
- * Step-by-step offline route instructions.
+ * Displays route status and guidance text.
  */
 export default function RouteDisplay({ route }: RouteDisplayProps) {
   const metrics =
     route.distanceMeters !== undefined && route.etaMinutes !== undefined
-      ? `${Math.round(route.distanceMeters)}m • ${route.etaMinutes} min`
+      ? `${Math.round(route.distanceMeters)}m - ${route.etaMinutes} min`
       : null;
 
   return (
