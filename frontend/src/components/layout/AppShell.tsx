@@ -1,7 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import Header from "@/components/layout/Header";
-import BottomNav from "@/components/layout/BottomNav";
+import SidebarNav from "@/components/layout/SidebarNav";
 import OfflineBanner from "@/components/offline/OfflineBanner";
 import SyncHealthCard from "@/components/offline/SyncHealthCard";
 import { formatRoleLabel, getLandingPath, getPortalSubtitle, getPortalTitle } from "@/features/auth/roleAccess";
@@ -41,7 +41,7 @@ export default function AppShell() {
 
   return (
     <div className={styles.shell}>
-      <BottomNav />
+      <SidebarNav />
       <div className={styles.mainPanel}>
         <Header title={portalTitle} subtitle={portalSubtitle} />
         <main className={styles.content}>

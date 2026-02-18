@@ -8,7 +8,7 @@ import {
   selectEffectiveRoleCodes,
   useAuthStore
 } from "@/stores/authStore";
-import styles from "./BottomNav.module.css";
+import styles from "./SidebarNav.module.css";
 
 interface SidebarItem {
   label: string;
@@ -67,7 +67,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
 /**
  * Unified sidebar used across dashboard and internal pages.
  */
-export default function BottomNav() {
+export default function SidebarNav() {
   const navigate = useNavigate();
   const roleCodes = useAuthStore(selectEffectiveRoleCodes);
   const permissions = useAuthStore(selectEffectivePermissions);
