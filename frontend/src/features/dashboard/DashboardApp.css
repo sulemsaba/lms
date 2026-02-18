@@ -1,16 +1,38 @@
 .dashboard-page {
-  --dashboard-bg: #f2f3f7;
-  --dashboard-surface: #ffffff;
-  --dashboard-border: #e3e7ef;
-  --dashboard-text: #111420;
-  --dashboard-muted: #677189;
-  --dashboard-primary: #2e5bff;
-  --dashboard-primary-soft: #ebf1ff;
-  --dashboard-success: #20bf6b;
-  --dashboard-warning: #f5a623;
-  --dashboard-danger: #ef4444;
-  --dashboard-purple: #8b5cf6;
-  --dashboard-pink: #ec4899;
+  --dashboard-bg: var(--color-background);
+  --dashboard-surface: var(--color-surface);
+  --dashboard-border: var(--color-border);
+  --dashboard-border-strong: #b7c5eb;
+  --dashboard-text: var(--color-text-primary);
+  --dashboard-muted: var(--color-text-secondary);
+  --dashboard-muted-strong: #27314a;
+  --dashboard-primary: var(--color-primary);
+  --dashboard-primary-soft: var(--color-primary-soft);
+  --dashboard-success: var(--color-success);
+  --dashboard-warning: var(--color-warning);
+  --dashboard-danger: var(--color-error);
+  --dashboard-purple: var(--color-secondary);
+  --dashboard-pink: var(--color-accent);
+  --dashboard-track: #edf0f5;
+  --dashboard-track-alt: #e8ecf3;
+  --dashboard-progress-empty: #cbd5e1;
+  --dashboard-card-soft: #fbfcff;
+  --dashboard-button-soft: #f7f9fd;
+  --dashboard-button-text: #44598f;
+  --dashboard-pill-completed-bg: #e8faef;
+  --dashboard-pill-completed-text: #137a43;
+  --dashboard-pill-progress-bg: #fff5dc;
+  --dashboard-pill-progress-text: #9a6400;
+  --dashboard-pill-pending-bg: #edf0f4;
+  --dashboard-pill-pending-text: #6b7280;
+  --dashboard-ghost-bg: #f2f6ff;
+  --dashboard-ghost-border: #cfdbf8;
+  --dashboard-ghost-border-hover: #a5baf2;
+  --dashboard-feature-border: #dbe1ee;
+  --dashboard-feature-bg: #f8faff;
+  --dashboard-feature-active-border: #a7baf2;
+  --dashboard-feature-active-bg: #eaf0ff;
+  --dashboard-entry-bg: #ffffff;
 
   display: grid;
   gap: 18px;
@@ -19,6 +41,31 @@
   font-family: "Sora", "Plus Jakarta Sans", "Segoe UI", sans-serif;
   border-radius: 18px;
   padding: 6px;
+}
+
+:root[data-theme="dark"] .dashboard-page {
+  --dashboard-border-strong: #455979;
+  --dashboard-muted-strong: #d7e0f0;
+  --dashboard-track: #1f2b42;
+  --dashboard-track-alt: #1b273d;
+  --dashboard-progress-empty: #53627c;
+  --dashboard-card-soft: #131f34;
+  --dashboard-button-soft: #16243a;
+  --dashboard-button-text: #c7d5f4;
+  --dashboard-pill-completed-bg: rgb(52 211 153 / 16%);
+  --dashboard-pill-completed-text: #7ee7bf;
+  --dashboard-pill-progress-bg: rgb(251 191 36 / 17%);
+  --dashboard-pill-progress-text: #fcd87d;
+  --dashboard-pill-pending-bg: #273249;
+  --dashboard-pill-pending-text: #c4cfdf;
+  --dashboard-ghost-bg: #172742;
+  --dashboard-ghost-border: #334c75;
+  --dashboard-ghost-border-hover: #4a6999;
+  --dashboard-feature-border: #2a3851;
+  --dashboard-feature-bg: #13213a;
+  --dashboard-feature-active-border: #4c6392;
+  --dashboard-feature-active-bg: #1d3154;
+  --dashboard-entry-bg: #101b2e;
 }
 
 .dashboard-page *,
@@ -98,7 +145,7 @@
 }
 
 .icon-btn:hover {
-  border-color: #b7c5eb;
+  border-color: var(--dashboard-border-strong);
   color: var(--dashboard-primary);
 }
 
@@ -197,7 +244,7 @@
   list-style: none;
   display: grid;
   gap: 5px;
-  color: #27314a;
+  color: var(--dashboard-muted-strong);
   font-size: 14px;
 }
 
@@ -211,7 +258,7 @@
 .subject-progress-track {
   height: 10px;
   border-radius: 999px;
-  background: #edf0f5;
+  background: var(--dashboard-track);
   overflow: hidden;
 }
 
@@ -276,8 +323,8 @@
 
 .link-button {
   border: 1px solid var(--dashboard-border);
-  background: #f7f9fd;
-  color: #44598f;
+  background: var(--dashboard-button-soft);
+  color: var(--dashboard-button-text);
   border-radius: 999px;
   padding: 7px 12px;
   cursor: pointer;
@@ -286,7 +333,7 @@
 }
 
 .link-button:hover {
-  border-color: #bfd0ff;
+  border-color: var(--dashboard-border-strong);
   color: var(--dashboard-primary);
 }
 
@@ -297,9 +344,9 @@
 }
 
 .activity-card {
-  border: 1px solid #e8ebf2;
+  border: 1px solid var(--dashboard-border);
   border-radius: 14px;
-  background: #fbfcff;
+  background: var(--dashboard-card-soft);
   padding: 12px;
   display: grid;
   gap: 10px;
@@ -332,18 +379,18 @@
 }
 
 .status-pill.completed {
-  color: #137a43;
-  background: #e8faef;
+  color: var(--dashboard-pill-completed-text);
+  background: var(--dashboard-pill-completed-bg);
 }
 
 .status-pill.in-progress {
-  color: #9a6400;
-  background: #fff5dc;
+  color: var(--dashboard-pill-progress-text);
+  background: var(--dashboard-pill-progress-bg);
 }
 
 .status-pill.not-started {
-  color: #6b7280;
-  background: #edf0f4;
+  color: var(--dashboard-pill-pending-text);
+  background: var(--dashboard-pill-pending-bg);
 }
 
 .activity-progress-row {
@@ -358,7 +405,7 @@
 .activity-progress-track {
   height: 8px;
   border-radius: 999px;
-  background: #e8ecf3;
+  background: var(--dashboard-track-alt);
   overflow: hidden;
 }
 
@@ -377,12 +424,12 @@
 }
 
 .activity-progress-fill.not-started {
-  background: #cbd5e1;
+  background: var(--dashboard-progress-empty);
 }
 
 .ghost-button {
-  border: 1px solid #cfdbf8;
-  background: #f2f6ff;
+  border: 1px solid var(--dashboard-ghost-border);
+  background: var(--dashboard-ghost-bg);
   color: var(--dashboard-primary);
   border-radius: 999px;
   padding: 8px 10px;
@@ -392,7 +439,7 @@
 }
 
 .ghost-button:hover {
-  border-color: #a5baf2;
+  border-color: var(--dashboard-ghost-border-hover);
 }
 
 .weekly-grid {
@@ -402,9 +449,9 @@
 }
 
 .weekly-column {
-  border: 1px solid #e8ebf2;
+  border: 1px solid var(--dashboard-border);
   border-radius: 14px;
-  background: #fbfcff;
+  background: var(--dashboard-card-soft);
   padding: 12px;
   display: grid;
   gap: 10px;
@@ -426,9 +473,9 @@
 }
 
 .weekly-entry {
-  border: 1px solid #e4e8f1;
+  border: 1px solid var(--dashboard-border);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--dashboard-entry-bg);
   padding: 8px;
   display: flex;
   justify-content: space-between;
@@ -449,7 +496,7 @@
 }
 
 .weekly-entry:hover {
-  border-color: #c8d4f1;
+  border-color: var(--dashboard-border-strong);
 }
 
 .feature-grid {
@@ -459,9 +506,9 @@
 }
 
 .feature-tile {
-  border: 1px solid #dbe1ee;
+  border: 1px solid var(--dashboard-feature-border);
   border-radius: 14px;
-  background: #f8faff;
+  background: var(--dashboard-feature-bg);
   padding: 10px;
   display: flex;
   gap: 10px;
@@ -476,8 +523,8 @@
 }
 
 .feature-tile.active {
-  border-color: #a7baf2;
-  background: #eaf0ff;
+  border-color: var(--dashboard-feature-active-border);
+  background: var(--dashboard-feature-active-bg);
 }
 
 .feature-copy {
