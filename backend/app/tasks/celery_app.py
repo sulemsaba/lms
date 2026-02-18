@@ -14,7 +14,7 @@ celery_app = Celery(
         "app.tasks.notifications",
         "app.tasks.analytics",
         "app.tasks.risk",
-        "app.tasks.pack",
+        "app.tasks.course_pack",
         "app.tasks.backup",
     ],
 )

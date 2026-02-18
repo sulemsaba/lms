@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getDashboardData } from "@/services/dashboard";
+import { getDashboardData } from "@/services/dashboardService";
 import { useAuthStore, selectEffectiveRoleCodes, selectEffectivePermissions } from "@/stores/authStore";
 
 export function useDashboard() {

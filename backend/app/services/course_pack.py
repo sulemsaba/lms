@@ -8,10 +8,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.content import CoursePack, Resource, ResourceVersion
-from app.services.file import signed_manifest
+from app.services.storage import signed_manifest
 
 
-class PackService:
+class CoursePackService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
