@@ -14,12 +14,12 @@
 }
 
 .theme-toggle-root.compact {
-  --toggle-width: 120px;
-  --toggle-height: 44px;
-  --slider-size: 34px;
+  --toggle-width: 104px;
+  --toggle-height: 36px;
+  --slider-size: 26px;
   --slider-offset: 5px;
-  --slider-travel: 76px;
-  --decor-scale: 0.72;
+  --slider-travel: 68px;
+  --decor-scale: 0.62;
 }
 
 .theme-toggle-input {
