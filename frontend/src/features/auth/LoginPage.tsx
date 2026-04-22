@@ -2,7 +2,6 @@ import { isAxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 import { getLandingPath } from "@/features/auth/roleAccess";
 import { fetchMyAuthorization, loginWithPassword } from "@/services/api/authApi";
 import { useAuthStore } from "@/stores/authStore";
@@ -48,6 +47,8 @@ export default function LoginPage() {
   const [offlinePin, setOfflinePin] = useState("");
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showDemoMode, setShowDemoMode] = useState(false);
+  const [showOfflineMode, setShowOfflineMode] = useState(false);
   const setSession = useAuthStore((state) => state.setSession);
   const setAuthorization = useAuthStore((state) => state.setAuthorization);
   const registerDevice = useAuthStore((state) => state.registerDevice);
@@ -128,76 +129,163 @@ export default function LoginPage() {
   };
 
   return (
-    <Card>
-      <div className={styles.stack}>
-        <h2>Sign In</h2>
-        <p>Use your institutional account. Access is routed by your assigned role.</p>
-
-        <label className={styles.field}>
-          <span>Email</span>
-          <input
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="admin@udsm.ac.tz"
-            autoComplete="username"
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span>Password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Password"
-            autoComplete="current-password"
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span>Institution ID (UUID)</span>
-          <input
-            value={institutionId}
-            onChange={(event) => setInstitutionId(event.target.value)}
-            placeholder="00000000-0000-0000-0000-000000000000"
-          />
-        </label>
-
-        <label className={styles.field}>
-          <span>Demo Role</span>
-          <select value={demoRole} onChange={(event) => setDemoRole(event.target.value)}>
-            {demoRoles.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className={styles.field}>
-          <span>Offline PIN (optional)</span>
-          <input
-            type="password"
-            value={offlinePin}
-            onChange={(event) => setOfflinePin(event.target.value)}
-            placeholder="Unlock cached session offline"
-          />
-        </label>
-
-        <div className={styles.actions}>
-          <Button onClick={() => void onSignIn()} loading={loading}>
-            Sign In
-          </Button>
-          <Button variant="secondary" onClick={onDemoMode} disabled={loading}>
-            Continue In Demo Mode
-          </Button>
-          <Button variant="text" onClick={onOfflineUnlock} disabled={loading}>
-            Unlock Offline Session
-          </Button>
+    <div className={styles.page}>
+      <div className={styles.loginContainer}>
+        {/* Branding */}
+        <div className={styles.branding}>
+          <div className={styles.logoIcon}>
+            <span className="material-symbols-rounded" style={{ fontSize: 36 }}>school</span>
+          </div>
+          <h1 className={styles.title}>Student Hub</h1>
+          <p className={styles.subtitle}>Sign in to your institutional account</p>
         </div>
 
-        {feedback ? <p className={styles.feedback}>{feedback}</p> : null}
+        {/* Main Sign-In Form */}
+        <form
+          className={styles.form}
+          onSubmit={(e) => {
+            e.preventDefault();
+            void onSignIn();
+          }}
+        >
+          <div className={styles.field}>
+            <label htmlFor="email" className={styles.fieldLabel}>
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>mail</span>
+              Email
+            </label>
+            <input
+              id="email"
+              className={styles.input}
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@udsm.ac.tz"
+              autoComplete="username"
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="password" className={styles.fieldLabel}>
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>lock</span>
+              Password
+            </label>
+            <input
+              id="password"
+              className={styles.input}
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="institutionId" className={styles.fieldLabel}>
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>business</span>
+              Institution ID
+            </label>
+            <input
+              id="institutionId"
+              className={styles.input}
+              value={institutionId}
+              onChange={(event) => setInstitutionId(event.target.value)}
+              placeholder="00000000-0000-0000-0000-000000000000"
+            />
+          </div>
+
+          <Button fullWidth onClick={() => void onSignIn()} loading={loading}>
+            Sign In
+          </Button>
+
+          {feedback ? <p className={styles.feedback}>{feedback}</p> : null}
+        </form>
+
+        {/* Divider */}
+        <div className={styles.divider}>
+          <span>or</span>
+        </div>
+
+        {/* Alternative Actions */}
+        <div className={styles.altActions}>
+          <button
+            className={styles.altActionBtn}
+            type="button"
+            onClick={() => {
+              setShowDemoMode(!showDemoMode);
+              setShowOfflineMode(false);
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 20 }}>play_circle</span>
+            Continue in Demo Mode
+          </button>
+
+          <button
+            className={styles.altActionBtn}
+            type="button"
+            onClick={() => {
+              setShowOfflineMode(!showOfflineMode);
+              setShowDemoMode(false);
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 20 }}>offline_pin</span>
+            Offline Access
+          </button>
+        </div>
+
+        {/* Demo Mode Panel */}
+        {showDemoMode && (
+          <div className={styles.expandedPanel}>
+            <div className={styles.field}>
+              <label className={styles.fieldLabel}>
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>badge</span>
+                Select Role
+              </label>
+              <select
+                className={styles.input}
+                value={demoRole}
+                onChange={(event) => setDemoRole(event.target.value)}
+              >
+                {demoRoles.map((role) => (
+                  <option key={role} value={role}>
+                    {role.replace("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button variant="secondary" fullWidth onClick={onDemoMode}>
+              Enter as {demoRole.replace("_", " ")}
+            </Button>
+          </div>
+        )}
+
+        {/* Offline Mode Panel */}
+        {showOfflineMode && (
+          <div className={styles.expandedPanel}>
+            <div className={styles.field}>
+              <label htmlFor="offlinePin" className={styles.fieldLabel}>
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>pin</span>
+                Offline PIN
+              </label>
+              <input
+                id="offlinePin"
+                className={styles.input}
+                type="password"
+                value={offlinePin}
+                onChange={(event) => setOfflinePin(event.target.value)}
+                placeholder="Enter your offline PIN"
+              />
+            </div>
+            <Button variant="text" fullWidth onClick={onOfflineUnlock}>
+              Unlock Offline Session
+            </Button>
+          </div>
+        )}
+
+        {/* Footer */}
+        <p className={styles.footer}>
+          Access is routed by your assigned institutional role.
+        </p>
       </div>
-    </Card>
+    </div>
   );
 }
