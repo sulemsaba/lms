@@ -51,7 +51,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     ]
   },
   {
-    title: "Productivity",
+    title: "joy",
     items: [
       { label: "Tasks", icon: "checklist", path: "/tasks" },
       { label: "Notes", icon: "edit_note", path: "/notes" },
