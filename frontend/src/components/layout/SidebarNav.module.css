@@ -1,14 +1,14 @@
 .container {
-  width: 280px;
+  width: 150px;
   height: 100vh;
   position: sticky;
   top: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 14px 12px 12px;
-  background: #070b14;
-  border-right: 1px solid #1a2438;
+  padding: 6px 4px 4cap;
+  background:#1b7f9b;
+  border-right: 1px solid #1b7f9b;
   overflow: hidden;
 }
 
@@ -18,7 +18,7 @@
   padding: 10px 10px 12px;
   border: 1px solid #1c2840;
   border-radius: 12px;
-  background: #0d1425;
+  background: #0d0f25;
 }
 
 .brandTitle {

@@ -51,7 +51,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     ]
   },
   {
-    title: "Productivity Hub",
+    title: "Productivity H",
     items: [
       { label: "Tasks", icon: "checklist", path: "/tasks" },
       { label: "Notes", icon: "edit_note", path: "/notes" },
@@ -91,7 +91,7 @@ export default function SidebarNav() {
   return (
     <aside className={styles.container} data-testid="side-nav">
       <div className={styles.brand}>
-        <p className={styles.brandTitle}>UDSM Hub</p>
+        <p className={styles.brandTitle}>St.Joseph Hub</p>
         <p className={styles.brandSubtitle}>Student navigation</p>
       </div>
 

@@ -33,7 +33,7 @@
   color: var(--color-text-primary);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 300px) {
   .shell {
     grid-template-columns: 1fr;
   }
