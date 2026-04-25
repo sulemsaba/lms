@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import styles from "./Button.module.css";
 
-type Variant = "primary" | "secondary" | "destructive" | "text";
+type Variant = "primary" | "secondary" | "text";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -24,8 +24,7 @@ export default function Button({
   const classNames = [
     styles.button,
     styles[variant],
-    fullWidth ? styles.fullWidth : "",
-    disabled || loading ? styles.disabled : ""
+    fullWidth ? styles.button : ""
   ]
     .filter(Boolean)
     .join(" ");
@@ -37,6 +36,7 @@ export default function Button({
       disabled={disabled || loading}
       data-testid="button"
       aria-busy={loading}
+      style={fullWidth ? { width: "100%" } : undefined}
     >
       {loading ? "Loading..." : children}
     </button>

@@ -13,6 +13,8 @@ export interface AuthState {
   impersonatedRoleCode: string | null;
   impersonatedPermissions: string[];
   isAuthenticated: boolean;
+  unreadNotifications: number;
+  user: { name: string; email: string } | null;
   setSession: (payload: { accessToken: string; refreshToken: string; institutionId: string | null }) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
   setInstitutionId: (institutionId: string) => void;
@@ -24,6 +26,8 @@ export interface AuthState {
   registerDevice: (deviceId: string) => void;
   setOfflinePin: (pin: string) => void;
   verifyOfflinePin: (pin: string) => boolean;
+  setUnreadNotifications: (count: number) => void;
+  setUser: (user: { name: string; email: string }) => void;
 }
 
 function hashPin(pin: string): string {
@@ -55,6 +59,8 @@ export const useAuthStore = create<AuthState>()(
       primaryRole: null,
       impersonatedRoleCode: null,
       impersonatedPermissions: [],
+      unreadNotifications: 0,
+      user: null,
       isAuthenticated: false,
       setSession: ({ accessToken, refreshToken, institutionId }) =>
         set({
@@ -107,11 +113,15 @@ export const useAuthStore = create<AuthState>()(
           primaryRole: null,
           impersonatedRoleCode: null,
           impersonatedPermissions: [],
+          unreadNotifications: 0,
+          user: null,
           isAuthenticated: false
         }),
       registerDevice: (deviceId) => set({ deviceId }),
       setOfflinePin: (pin) => set({ offlinePinHash: hashPin(pin) }),
-      verifyOfflinePin: (pin) => get().offlinePinHash === hashPin(pin)
+      verifyOfflinePin: (pin) => get().offlinePinHash === hashPin(pin),
+      setUnreadNotifications: (count) => set({ unreadNotifications: count }),
+      setUser: (user) => set({ user })
     }),
     {
       name: "auth-storage",

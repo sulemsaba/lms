@@ -1,7 +1,11 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
 import Button from "@/components/ui/Button";
+import Icon from "@/components/ui/Icon";
 import Header from "@/components/layout/Header";
 import SidebarNav from "@/components/layout/SidebarNav";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import MobileDrawer from "@/components/layout/MobileDrawer";
 import OfflineBanner from "@/components/offline/OfflineBanner";
 import SyncHealthCard from "@/components/offline/SyncHealthCard";
 import { formatRoleLabel, getLandingPath, getPortalSubtitle, getPortalTitle } from "@/features/auth/roleAccess";
@@ -29,10 +33,33 @@ export default function AppShell() {
   const actualPermissions = useAuthStore((state) => state.permissions);
   const impersonatedRoleCode = useAuthStore((state) => state.impersonatedRoleCode);
   const stopImpersonation = useAuthStore((state) => state.stopImpersonation);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const resizeTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const showOfflineBanner = syncStatus === "offline" || syncStatus === "error";
   const portalTitle = getPortalTitle(roleCodes, permissions);
   const portalSubtitle = getPortalSubtitle(roleCodes, permissions);
+
+  // Detect mobile viewport (debounced)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+
+    const handleResize = () => {
+      if (resizeTimer.current) clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(checkMobile, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimer.current) clearTimeout(resizeTimer.current);
+    };
+  }, []);
 
   const onStopImpersonation = () => {
     stopImpersonation();
@@ -41,9 +68,23 @@ export default function AppShell() {
 
   return (
     <div className={styles.shell}>
-      <SidebarNav />
+      {/* Desktop Sidebar (hidden on mobile) */}
+      {!isMobile && <SidebarNav />}
+      
       <div className={styles.mainPanel}>
-        <Header title={portalTitle} subtitle={portalSubtitle} />
+        {/* Sticky header row with hamburger on mobile */}
+        <div className={styles.mobileHeaderWrapper}>
+          {isMobile && (
+            <button
+              className={styles.hamburgerButton}
+              onClick={() => setMobileDrawerOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <Icon name="menu" size={22} />
+            </button>
+          )}
+          <Header title={portalTitle} subtitle={portalSubtitle} />
+        </div>
         <main className={styles.content}>
           {impersonatedRoleCode ? (
             <div className={styles.impersonationBanner}>
@@ -63,6 +104,17 @@ export default function AppShell() {
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation (only on mobile) */}
+      {isMobile && <MobileBottomNav onMenuClick={() => setMobileDrawerOpen(true)} />}
+
+      {/* Mobile Drawer */}
+      {isMobile && (
+        <MobileDrawer
+          isOpen={mobileDrawerOpen}
+          onClose={() => setMobileDrawerOpen(false)}
+        />
+      )}
     </div>
   );
 }

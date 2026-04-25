@@ -9,7 +9,7 @@ import RequireAdmin from "@/features/auth/RequireAdmin";
 import RequireFeatureAccess from "@/features/auth/RequireFeatureAccess";
 
 const AppShell = lazy(() => import("@/components/layout/AppShell"));
-const DashboardApp = lazy(() => import("@/features/dashboard/DashboardApp"));
+const StudentHub = lazy(() => import("@/features/dashboard/StudentHub"));
 const CoursesPage = lazy(() => import("@/features/courses/CoursesPage"));
 const AssessmentsPage = lazy(() => import("@/features/assessments/AssessmentsPage"));
 const MapPage = lazy(() => import("@/features/map/MapPage"));
@@ -23,6 +23,13 @@ const NotificationsPage = lazy(() => import("@/features/notifications/Notificati
 const QueueManagerPage = lazy(() => import("@/features/offline/QueueManagerPage"));
 const NotesPage = lazy(() => import("@/features/notes/NotesPage"));
 const SearchPage = lazy(() => import("@/features/search/SearchPage"));
+const FocusMode = lazy(() => import("@/features/focus/FocusMode"));
+const QuickRecap = lazy(() => import("@/features/learning/QuickRecap"));
+const AITutorComponent = lazy(() => import("@/components/ai/AITutor"));
+const Leaderboard = lazy(() => import("@/components/gamification/Leaderboard"));
+const Badges = lazy(() => import("@/components/gamification/Badges"));
+const AvatarCustomizer = lazy(() => import("@/components/gamification/AvatarCustomizer"));
+const SocialSection = lazy(() => import("@/components/layout/SocialSection"));
 const AttendanceScannerPage = lazy(() => import("@/features/attendance/AttendanceScannerPage"));
 
 const routeLoadingFallback = <div style={{ padding: "16px" }}>Loading...</div>;
@@ -40,7 +47,7 @@ export const router = createBrowserRouter([
       </RequireAuth>
     ),
     children: [
-      { index: true, element: withSuspense(<DashboardApp />) },
+      { index: true, element: withSuspense(<StudentHub />) },
       { path: "courses", element: withSuspense(<CoursesPage />) },
       { path: "assessments", element: withSuspense(<AssessmentsPage />) },
       { path: "assignments", element: withSuspense(<AssessmentsPage />) },
@@ -78,10 +85,7 @@ export const router = createBrowserRouter([
         path: "community",
         element: (
           <RequireFeatureAccess featurePath="/community">
-            <FeaturePlaceholderPage
-              title="Community"
-              description="Access student discussions, announcements, and collaboration spaces."
-            />
+            {withSuspense(<SocialSection />)}
           </RequireFeatureAccess>
         )
       },
@@ -95,12 +99,29 @@ export const router = createBrowserRouter([
         path: "focus-mode",
         element: (
           <RequireFeatureAccess featurePath="/focus-mode">
-            <FeaturePlaceholderPage
-              title="Focus Mode"
-              description="Use structured focus sessions and break cycles to improve study consistency."
-            />
+            {withSuspense(<FocusMode />)}
           </RequireFeatureAccess>
         )
+      },
+      {
+        path: "quick-recap",
+        element: withSuspense(<QuickRecap />)
+      },
+      {
+        path: "ai-tutor",
+        element: withSuspense(<AITutorComponent />)
+      },
+      {
+        path: "leaderboard",
+        element: withSuspense(<Leaderboard />)
+      },
+      {
+        path: "badges",
+        element: withSuspense(<Badges />)
+      },
+      {
+        path: "avatar",
+        element: withSuspense(<AvatarCustomizer />)
       },
       {
         path: "resources",

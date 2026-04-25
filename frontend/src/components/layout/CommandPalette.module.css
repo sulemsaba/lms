@@ -1,0 +1,450 @@
+/* Command Palette - Modern Quick Access */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20vh;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+  max-height: 70vh;
+  background: var(--color-surface);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px color-mix(in srgb, var(--color-border) 30%, transparent);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.header {
+  padding: 24px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 30%, transparent);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.searchContainer {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 16px;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.searchInput {
+  width: 100%;
+  height: 56px;
+  padding: 0 56px;
+  border-radius: 16px;
+  border: 2px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 98%, transparent);
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.clearButton {
+  position: absolute;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: none;
+  background: color-mix(in srgb, var(--color-border) 30%, transparent);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+  background: color-mix(in srgb, var(--color-border) 50%, transparent);
+  transform: rotate(90deg);
+}
+
+.closeButton {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  border: 2px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.closeButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+.closeText {
+  opacity: 0.8;
+}
+
+/* Results */
+.results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+  max-height: 400px;
+}
+
+.results::-webkit-scrollbar {
+  width: 8px;
+}
+
+.results::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-border) 50%, transparent);
+  border-radius: 4px;
+}
+
+.results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--color-text-secondary);
+  opacity: 0.4;
+  margin-bottom: 20px;
+}
+
+.emptyTitle {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.emptyDescription {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+/* Category Groups */
+.categoryGroup {
+  margin-bottom: 24px;
+}
+
+.categoryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 20%, transparent);
+}
+
+.categoryName {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+}
+
+.categoryCount {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  border-radius: 10px;
+}
+
+/* Commands List */
+.commandsList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.commandItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  border-radius: 0;
+  position: relative;
+}
+
+.commandItem:hover,
+.commandItem.selected {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+.commandItem:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+.commandIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.commandContent {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.commandLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.commandShortcut {
+  font-size: 12px;
+  font-family: monospace;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--color-border) 30%, transparent);
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+}
+
+.selectionIndicator {
+  color: var(--color-primary);
+  opacity: 0.8;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateX(0);
+  }
+}
+
+/* Footer */
+.footer {
+  padding: 16px 24px;
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 30%, transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: color-mix(in srgb, var(--color-surface) 98%, transparent);
+}
+
+.shortcutGroup {
+  display: flex;
+  gap: 16px;
+}
+
+.shortcutItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcutKey {
+  font-size: 11px;
+  font-family: monospace;
+  padding: 4px 6px;
+  background: color-mix(in srgb, var(--color-border) 30%, transparent);
+  color: var(--color-text-secondary);
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  min-width: 24px;
+  text-align: center;
+}
+
+.shortcutLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+}
+
+.stats {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+}
+
+.statsText {
+  font-weight: 500;
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: color-mix(in srgb, var(--color-surface) 98%, transparent);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 0 0 1px color-mix(in srgb, var(--color-border) 40%, transparent);
+  }
+  
+  .searchInput {
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  }
+  
+  .footer {
+    background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  
+  .container {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 24px 24px 0 0;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .header {
+    padding: 20px;
+  }
+  
+  .closeButton {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .searchInput {
+    height: 52px;
+    font-size: 16px;
+  }
+  
+  .footer {
+    padding: 12px 20px;
+  }
+  
+  .shortcutGroup {
+    display: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .container,
+  .commandItem,
+  .closeButton,
+  .clearButton {
+    animation: none;
+    transition: none;
+  }
+  
+  .commandItem:active {
+    transform: none;
+  }
+  
+  .selectionIndicator {
+    animation: none;
+  }
+}

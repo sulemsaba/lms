@@ -56,6 +56,7 @@ export default function LoginPage() {
   const permissions = useAuthStore((state) => state.permissions);
   const verifyOfflinePin = useAuthStore((state) => state.verifyOfflinePin);
   const unlockOfflineSession = useAuthStore((state) => state.unlockOfflineSession);
+  const setUser = useAuthStore((state) => state.setUser);
   const navigate = useNavigate();
 
   const onSignIn = async () => {
@@ -87,9 +88,11 @@ export default function LoginPage() {
         const authz = await fetchMyAuthorization(resolvedInstitutionId);
         const roleCodes = authz.roles.map((role) => role.role_code);
         setAuthorization(roleCodes, authz.permissions);
+        setUser({ name: email.split('@')[0], email });
         navigate(getLandingPath(roleCodes, authz.permissions), { replace: true });
       } catch {
         setAuthorization([demoRole], []);
+        setUser({ name: email.split('@')[0], email });
         setFeedback("Authenticated, but RBAC profile lookup failed. Using selected role view temporarily.");
         navigate(getLandingPath([demoRole], []), { replace: true });
       }
@@ -108,6 +111,7 @@ export default function LoginPage() {
       institutionId: fallbackInstitutionId
     });
     setAuthorization([demoRole], []);
+    setUser({ name: `${demoRole.replace('_', ' ')} User`, email: `${demoRole}@demo.udsm.ac.tz` });
     registerDevice(`demo-${demoRole}`);
     navigate(getLandingPath([demoRole], []), { replace: true });
   };

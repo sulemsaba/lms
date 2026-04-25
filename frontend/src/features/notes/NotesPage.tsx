@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -30,10 +31,21 @@ function sortNotes(items: LocalNote[]): LocalNote[] {
  * Personal study notes with local-only persistence for offline usage.
  */
 export default function NotesPage() {
+  const [searchParams] = useSearchParams();
   const [notes, setNotes] = useState<LocalNote[]>([]);
   const [draft, setDraft] = useState<DraftNote>(initialDraft);
   const [search, setSearch] = useState("");
   const [feedback, setFeedback] = useState("");
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  
+  // Handle /notes?new=true - auto-focus on the title input
+  const showNewNoteForm = searchParams.get('new') === 'true';
+  useEffect(() => {
+    if (showNewNoteForm && titleInputRef.current) {
+      titleInputRef.current.scrollIntoView({ behavior: 'smooth' });
+      titleInputRef.current.focus();
+    }
+  }, [showNewNoteForm]);
 
   const reload = async () => {
     const rows = await db.notes.toArray();

@@ -206,6 +206,11 @@ export function buildStudentFeaturePaths(roleCodes: string[], permissions: strin
     allowed.add("/focus-mode");
     allowed.add("/resources");
     allowed.add("/study-groups");
+    allowed.add("/quick-recap");
+    allowed.add("/ai-tutor");
+    allowed.add("/leaderboard");
+    allowed.add("/badges");
+    allowed.add("/avatar");
   }
 
   return Array.from(allowed);

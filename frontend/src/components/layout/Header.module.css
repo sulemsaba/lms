@@ -1,34 +1,95 @@
 .header {
-  min-height: 80px;
-  padding: 0 var(--spacing-xl);
+  min-height: 72px;
+  padding: 12px var(--spacing-xl);
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
   border-bottom: 1px solid var(--color-border);
   background: color-mix(in srgb, var(--color-background) 86%, #ffffff);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 100;
+  transition: min-height 0.2s ease, padding 0.2s ease;
+}
+
+.compact {
+  min-height: 56px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  padding-bottom: 8px;
 }
 
 .title {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: font-size 0.2s ease;
+}
+
+.compact .title {
+  font-size: 1.1rem;
 }
 
 .subtitle {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.compact .subtitle {
+  display: none;
 }
 
 @media (max-width: 900px) {
   .header {
-    min-height: 72px;
-    padding: 0 var(--spacing-md);
+    min-height: 64px;
+    padding: 10px var(--spacing-md);
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  }
+
+  .compact {
+    min-height: 52px;
+    padding-top: calc(6px + env(safe-area-inset-top, 0px));
+    padding-bottom: 6px;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .compact .title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    min-height: 56px;
+    padding: 8px var(--spacing-sm);
+    padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+}
+
+/* Dark mode border adjustment */
+@media (prefers-color-scheme: dark) {
+  .header {
+    border-bottom-color: color-mix(in srgb, var(--color-border) 50%, transparent);
   }
 }
