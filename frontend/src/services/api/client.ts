@@ -43,12 +43,54 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return next;
 });
 
+interface RefreshResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  const { refreshToken, setTokens, clearAuth } = useAuthStore.getState();
+  if (!refreshToken) {
+    clearAuth();
+    return null;
+  }
+  try {
+    // Bare axios call: must skip the interceptors so a failed refresh can't loop.
+    const response = await axios.post<RefreshResponse>(
+      `${baseURL}/auth/refresh`,
+      { refresh_token: refreshToken },
+      { timeout: 15000 }
+    );
+    setTokens(response.data.access_token, response.data.refresh_token);
+    return response.data.access_token;
+  } catch {
+    clearAuth();
+    return null;
+  }
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().clearAuth();
+  async (error: AxiosError) => {
+    const original = error.config as (InternalAxiosRequestConfig & { _retried?: boolean }) | undefined;
+
+    if (error.response?.status !== 401 || !original || original._retried) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    refreshPromise ??= refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+    const newToken = await refreshPromise;
+    if (!newToken) {
+      return Promise.reject(error);
+    }
+
+    original._retried = true;
+    original.headers = AxiosHeaders.from(original.headers);
+    original.headers.set("Authorization", `Bearer ${newToken}`);
+    return apiClient.request(original);
   }
 );
