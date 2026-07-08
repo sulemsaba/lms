@@ -1,6 +1,6 @@
 .theme-toggle-root {
-  --toggle-day: #5ebad3;
-  --toggle-night: #0a1f29;
+  --toggle-day: var(--color-info);
+  --toggle-night: var(--color-surface);
   --toggle-speed: 0.45s;
   --toggle-width: 140px;
   --toggle-height: 45px;
@@ -70,9 +70,9 @@
   left: var(--slider-offset);
   width: var(--slider-size);
   height: var(--slider-size);
-  background-color: #ffdb00;
+  background-color: var(--color-gold);
   border-radius: 50%;
-  box-shadow: 0 0 15px #fff200;
+  box-shadow: 0 0 15px var(--color-gold);
   z-index: 2;
   transition:
     transform var(--toggle-speed),
@@ -90,7 +90,7 @@
 
 .theme-toggle-cloud {
   position: absolute;
-  background: #ffffff;
+  background: var(--color-surface);
   border-radius: 20px;
   opacity: 0.85;
   transition: opacity var(--toggle-speed);
@@ -119,7 +119,7 @@
 
 .theme-toggle-star {
   position: absolute;
-  background: #ffffff;
+  background: var(--color-text-primary);
   border-radius: 50%;
   width: 2px;
   height: 2px;
@@ -153,9 +153,9 @@
 
 .theme-toggle-input:checked + .theme-toggle-switch .theme-toggle-slider {
   transform: translateX(var(--slider-travel));
-  background-color: #f3f3f3;
+  background-color: var(--color-text-primary);
   box-shadow:
-    inset -5px -2px 0 0 #d1d1d1,
+    inset -5px -2px 0 0 var(--color-text-secondary),
     0 0 15px rgb(255 255 255 / 40%);
 }
 

@@ -110,7 +110,7 @@ export default function ModernMap() {
       id: 'coffee',
       icon: 'local_cafe',
       label: 'Coffee Spots',
-      color: '#8B4513',
+      color: 'var(--color-bronze)',
       action: () => {
         setQuery('coffee cafe');
         setActiveCategory('canteen');
@@ -130,7 +130,7 @@ export default function ModernMap() {
       id: 'food',
       icon: 'restaurant',
       label: 'Food',
-      color: '#FF6B6B',
+      color: 'var(--color-accent)',
       action: () => {
         setQuery('');
         setActiveCategory('canteen');
@@ -140,7 +140,7 @@ export default function ModernMap() {
       id: 'directions',
       icon: 'directions',
       label: 'Directions',
-      color: '#4CAF50',
+      color: 'var(--color-success)',
       action: () => setViewState(prev => ({ ...prev, showRoutePanel: true }))
     }
   ], []);

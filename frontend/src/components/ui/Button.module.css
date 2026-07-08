@@ -15,7 +15,7 @@
 
 .primary {
   background: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-on-primary);
 }
 
 .secondary {
@@ -30,12 +30,12 @@
 }
 
 .primary:hover {
-  background: color-mix(in srgb, var(--color-primary) 90%, #000000);
+  background: color-mix(in srgb, var(--color-primary) 90%, var(--color-text-primary));
 }
 
 .secondary:hover {
-  background: color-mix(in srgb, var(--color-surface) 90%, #000000);
-  border-color: color-mix(in srgb, var(--color-border) 80%, #000000);
+  background: var(--color-surface-hover);
+  border-color: color-mix(in srgb, var(--color-border) 80%, var(--color-text-primary));
 }
 
 .text:hover {

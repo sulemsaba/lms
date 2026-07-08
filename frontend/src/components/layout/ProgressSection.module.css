@@ -110,8 +110,8 @@
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #000;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-warning));
+  color: var(--color-on-primary);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 700;
@@ -169,7 +169,7 @@
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-warning));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,7 +209,7 @@
   font-size: 28px;
   font-weight: 900;
   color: var(--color-text-primary);
-  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-warning));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -231,7 +231,7 @@
 
 .streakProgressBar {
   height: 100%;
-  background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(90deg, var(--color-accent), var(--color-warning));
   border-radius: 4px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -332,7 +332,7 @@
 }
 
 .focusFill {
-  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  background: linear-gradient(90deg, var(--color-success), color-mix(in srgb, var(--color-success) 55%, var(--color-warning)));
 }
 
 .progressSubtext {
@@ -440,7 +440,7 @@
   align-items: center;
   gap: 4px;
   padding: 12px;
-  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-warning));
   border-radius: 14px;
   color: white;
   animation: firePulse 2s infinite;

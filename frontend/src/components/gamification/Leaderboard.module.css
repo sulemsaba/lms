@@ -72,21 +72,21 @@
 }
 
 .spot1 {
-  background: linear-gradient(135deg, #FFD700 20%, #FFA500 80%);
-  border: 2px solid #FFD700;
+  background: linear-gradient(135deg, var(--color-gold) 20%, var(--color-warning) 80%);
+  border: 2px solid var(--color-gold);
   order: 2;
   padding-top: 32px;
 }
 
 .spot2 {
-  background: linear-gradient(135deg, #E0E0E0 20%, #C0C0C0 80%);
-  border: 2px solid #C0C0C0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-silver) 55%, var(--color-surface)) 20%, var(--color-silver) 80%);
+  border: 2px solid var(--color-silver);
   order: 1;
 }
 
 .spot3 {
-  background: linear-gradient(135deg, #CD7F32 20%, #A0522D 80%);
-  border: 2px solid #CD7F32;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-bronze) 70%, var(--color-gold)) 20%, var(--color-bronze) 80%);
+  border: 2px solid var(--color-bronze);
   order: 3;
 }
 
@@ -160,15 +160,15 @@
 }
 
 .rankGold {
-  color: #FFD700;
+  color: var(--color-gold);
 }
 
 .rankSilver {
-  color: #C0C0C0;
+  color: var(--color-silver);
 }
 
 .rankBronze {
-  color: #CD7F32;
+  color: var(--color-bronze);
 }
 
 .avatar {
@@ -210,7 +210,7 @@
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #FF6B6B;
+  color: var(--color-accent);
   font-weight: 600;
 }
 

@@ -57,12 +57,12 @@
 }
 
 .phaseBadge.break {
-  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+  background: linear-gradient(135deg, var(--color-success), color-mix(in srgb, var(--color-success) 55%, var(--color-warning)));
   color: white;
 }
 
 .phaseBadge.longBreak {
-  background: linear-gradient(135deg, #2196F3, #03A9F4);
+  background: linear-gradient(135deg, var(--color-info), color-mix(in srgb, var(--color-info) 70%, var(--color-surface)));
   color: white;
 }
 
@@ -101,7 +101,7 @@
 }
 
 .pauseButton {
-  background: linear-gradient(135deg, #FF9800, #FF5722);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-accent));
   color: white;
   box-shadow: 0 4px 16px rgba(255, 152, 0, 0.4);
 }
@@ -321,7 +321,7 @@
 }
 
 .breakButton.primary {
-  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+  background: linear-gradient(135deg, var(--color-success), color-mix(in srgb, var(--color-success) 55%, var(--color-warning)));
   color: white;
 }
 

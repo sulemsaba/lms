@@ -78,7 +78,7 @@
 }
 
 .unlocked .badgeIcon {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background: linear-gradient(135deg, var(--color-gold), var(--color-warning));
   animation: badgeGlow 2s infinite;
 }
 

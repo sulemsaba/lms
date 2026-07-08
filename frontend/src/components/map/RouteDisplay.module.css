@@ -42,9 +42,9 @@
 
 .warning {
   margin: 0;
-  color: #92400e;
-  background: #ffedd5;
-  border: 1px solid #fed7aa;
+  color: var(--color-bronze);
+  background: var(--color-warning-soft);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, var(--color-surface));
   border-radius: var(--border-radius-md);
   padding: 8px 10px;
   font-size: var(--font-size-sm);
@@ -52,9 +52,9 @@
 
 .error {
   margin: 0;
-  color: #b91c1c;
-  background: #fee2e2;
-  border: 1px solid #fecaca;
+  color: var(--color-error-strong);
+  background: var(--color-error-soft);
+  border: 1px solid color-mix(in srgb, var(--color-error) 35%, var(--color-surface));
   border-radius: var(--border-radius-md);
   padding: 8px 10px;
   font-size: var(--font-size-sm);

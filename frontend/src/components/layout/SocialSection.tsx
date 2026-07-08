@@ -71,9 +71,9 @@ export default function SocialSection() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'online': return '#4CAF50';
-      case 'idle': return '#FF9800';
-      default: return '#9E9E9E';
+      case 'online': return 'var(--color-success)';
+      case 'idle': return 'var(--color-warning)';
+      default: return 'var(--color-text-muted)';
     }
   };
 

@@ -95,8 +95,8 @@
 }
 
 .impersonationBanner {
-  border: 1px solid color-mix(in srgb, var(--color-warning) 32%, #ffffff);
-  background: color-mix(in srgb, var(--color-warning) 12%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 32%, var(--color-surface));
+  background: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
   border-radius: 12px;
   padding: var(--spacing-md);
   display: flex;

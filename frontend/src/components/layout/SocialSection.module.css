@@ -41,7 +41,7 @@
   font-size: 18px;
   font-weight: 800;
   color: var(--color-text-primary);
-  background: linear-gradient(135deg, var(--color-secondary), #9C27B0);
+  background: linear-gradient(135deg, var(--color-secondary), color-mix(in srgb, var(--color-secondary) 70%, var(--color-accent)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -57,7 +57,7 @@
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background: #4CAF50;
+  background: var(--color-success);
   animation: pulse 2s infinite;
 }
 
@@ -475,15 +475,15 @@
 }
 
 .eventIcon.academic {
-  background: linear-gradient(135deg, #2196F3, #03A9F4);
+  background: linear-gradient(135deg, var(--color-info), color-mix(in srgb, var(--color-info) 70%, var(--color-surface)));
 }
 
 .eventIcon.social {
-  background: linear-gradient(135deg, #9C27B0, #E91E63);
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
 }
 
 .eventIcon.sports {
-  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+  background: linear-gradient(135deg, var(--color-success), color-mix(in srgb, var(--color-success) 55%, var(--color-warning)));
 }
 
 .eventInfo {
@@ -519,7 +519,7 @@
   padding: 8px 16px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #FF9800, #FF5722);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-accent));
   color: white;
   font-size: 12px;
   font-weight: 700;
@@ -551,8 +551,8 @@
 }
 
 .viewAllButton:hover {
-  border-color: #FF9800;
-  color: #FF9800;
+  border-color: var(--color-warning);
+  color: var(--color-warning);
   background: rgba(255, 152, 0, 0.08);
 }
 

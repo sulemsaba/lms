@@ -2,8 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 15;
-  border: 1px solid color-mix(in srgb, var(--color-warning) 34%, #ffffff);
-  background: color-mix(in srgb, var(--color-warning) 14%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 34%, var(--color-surface));
+  background: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface));
   color: var(--color-text-primary);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-sm) var(--spacing-md);
