@@ -1,19 +1,21 @@
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["icons/icon-192.png", "icons/icon-512.png"],
       manifest: {
         name: "UDSM Student Hub",
         short_name: "Student Hub",
-        theme_color: "#6dd7fd",
-        background_color: "#f5ffff",
+        theme_color: "#4f46e5",
+        background_color: "#f3f4f6",
         display: "standalone",
         start_url: "/",
         icons: [

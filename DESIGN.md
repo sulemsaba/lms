@@ -63,7 +63,8 @@ Mobile-first. Breakpoints: `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 · `2x
 ## 8. Component Rules
 
 - Build screens from the UI kit in `frontend/src/components/ui/` (`Button`, `Card`, `Badge`, `Icon`, `SkeletonLoader`) before hand-rolling anything.
-- Styling is **CSS Modules only** (`*.module.css`); no new global CSS files, no inline styles except dynamic values (e.g. progress percentages).
+- Styling is **Tailwind CSS v4** for all new and reworked UI. Utilities are mapped to the tokens in `globals.css` (`@theme inline`): `bg-primary`, `text-fg` / `text-fg-muted` / `text-fg-faint`, `bg-surface` / `bg-surface-hover`, `border-border`, `shadow-1` / `shadow-2` / `shadow-soft`, `rounded-sm|md|lg`, status colors and their `*-soft` tints, `dark:` variant keyed to `[data-theme="dark"]`.
+- Existing CSS Modules (`*.module.css`) are **legacy**: don't add new ones; migrate to Tailwind when you rework a screen. No new global CSS files; inline styles only for dynamic values (e.g. progress percentages).
 - Icons are Google Material Symbols via the `Icon` component.
 
 ## 9. For future clients (Flutter)
