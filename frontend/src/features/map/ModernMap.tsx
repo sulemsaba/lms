@@ -1,26 +1,20 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/Icon";
-import { useAuthStore } from "@/stores/authStore";
 import { fetchVenues } from "@/services/api/venuesApi";
 import {
   CAMPUS_ACCESSIBLE_ROUTES,
   CAMPUS_BUILDING_OUTLINES,
   CAMPUS_CATEGORY_CONFIG,
   CAMPUS_CATEGORY_ORDER,
-  CAMPUS_CENTER,
   enrichWithNetworkVenues,
   type CampusCategory,
-  type CampusLocation,
-  type FloorSpaceKind
+  type CampusLocation
 } from "@/features/map/campusMapData";
 import {
   buildMapEntityIndex,
-  decodeMapEntityRef,
-  encodeMapEntityRef,
   mapEntityKey,
   searchMapEntities,
-  type MapEntityRef,
   type MapSearchEntity
 } from "@/features/map/mapSearch";
 import "./ModernMap.css";
@@ -30,17 +24,6 @@ type CategoryFilter = "all" | CampusCategory;
 const CATEGORY_FILTERS: CategoryFilter[] = ["all", ...CAMPUS_CATEGORY_ORDER];
 const SEARCH_DEBOUNCE_MS = 150;
 const SEARCH_RESULT_LIMIT = 50;
-
-const FLOOR_SPACE_KIND_LABEL: Record<FloorSpaceKind, string> = {
-  classroom: "Classroom",
-  lab: "Lab",
-  restroom: "Restroom",
-  elevator: "Elevator",
-  quiet_zone: "Quiet Zone",
-  study_room: "Study Room",
-  office: "Office",
-  entrance: "Entrance"
-};
 
 interface QuickAction {
   id: string;
@@ -59,9 +42,7 @@ interface MapViewState {
 
 export default function ModernMap() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const user = useAuthStore((state) => state.user);
-  
+
   // State
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -75,7 +56,6 @@ export default function ModernMap() {
   const [networkVenues, setNetworkVenues] = useState<ReturnType<typeof enrichWithNetworkVenues>>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEntity, setSelectedEntity] = useState<MapSearchEntity | null>(null);
-  const [selectedFloorId, setSelectedFloorId] = useState<string | null>(null);
 
   // Load venues
   useEffect(() => {
@@ -133,7 +113,7 @@ export default function ModernMap() {
       color: '#8B4513',
       action: () => {
         setQuery('coffee cafe');
-        setActiveCategory('food');
+        setActiveCategory('canteen');
       }
     },
     {
@@ -153,7 +133,7 @@ export default function ModernMap() {
       color: '#FF6B6B',
       action: () => {
         setQuery('');
-        setActiveCategory('food');
+        setActiveCategory('canteen');
       }
     },
     {
@@ -591,7 +571,7 @@ export default function ModernMap() {
           </div>
           <div className="stat-item">
             <Icon name="restaurant" size={16} />
-            <span>{networkVenues.filter(v => v.category === 'food').length} food spots</span>
+            <span>{networkVenues.filter(v => v.category === 'canteen').length} food spots</span>
           </div>
           <div className="stat-item">
             <Icon name="menu_book" size={16} />

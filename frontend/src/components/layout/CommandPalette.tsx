@@ -23,7 +23,6 @@ interface CommandPaletteProps {
 export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const navigate = useNavigate();
   const { allItems } = useSidebarItems();
-  const user = useAuthStore((state) => state.user);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -288,7 +287,7 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
                   </span>
                 </div>
                 <div className={styles.commandsList}>
-                  {categoryCommands.map((cmd, index) => {
+                  {categoryCommands.map((cmd) => {
                     const globalIndex = filteredCommands.findIndex(c => c.id === cmd.id);
                     const isSelected = globalIndex === selectedIndex;
                     
