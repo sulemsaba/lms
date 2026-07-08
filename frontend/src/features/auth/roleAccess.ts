@@ -44,9 +44,9 @@ function addUnique(items: TabItem[], item: TabItem): void {
   }
 }
 
-type Experience = "admin" | "teaching" | "student" | "guest";
+export type Experience = "admin" | "teaching" | "student" | "guest";
 
-function resolveExperience(roleCodes: string[], permissions: string[]): Experience {
+export function resolveExperience(roleCodes: string[], permissions: string[]): Experience {
   if (hasAnyRole(roleCodes, ADMIN_ROLES) || permissions.includes("system.users_roles.manage")) {
     return "admin";
   }
