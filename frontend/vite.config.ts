@@ -14,8 +14,8 @@ export default defineConfig({
       manifest: {
         name: "UDSM Student Hub",
         short_name: "Student Hub",
-        theme_color: "#4f46e5",
-        background_color: "#f3f4f6",
+        theme_color: "#2e7d4f",
+        background_color: "#f6f7f4",
         display: "standalone",
         start_url: "/",
         icons: [

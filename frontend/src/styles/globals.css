@@ -46,6 +46,7 @@
   --color-transparent: transparent;
 
   --font-sans: var(--font-family);
+  --font-display: var(--font-display);
 
   --radius-sm: var(--border-radius-sm);
   --radius-md: var(--border-radius-md);
