@@ -114,8 +114,7 @@ export default function SidebarNav() {
           {!isCollapsed && (
             <>
               <div className={styles.brandContent}>
-                <p className={styles.brandTitle}>UDSM Hub</p>
-                <p className={styles.brandSubtitle}>Sharp Minds, Brave Futures</p>
+                <p className={styles.brandTitle}>Student Hub</p>
               </div>
               
               {/* Quick Search */}
@@ -138,11 +137,11 @@ export default function SidebarNav() {
         <nav className={styles.nav} aria-label="Side navigation">
           {sections.map((section) => (
             <div key={section.title} className={styles.section}>
-              {!isCollapsed && (
+              {!isCollapsed && section.title ? (
                 <p className={styles.category}>
                   {section.title}
                 </p>
-              )}
+              ) : null}
               <div className={styles.sectionItems}>
                 {section.items.map((item) => {
                   const isActive = location.pathname === item.path || 

@@ -5,53 +5,58 @@ import { SidebarItem, SidebarSection } from '@/components/layout/types';
 
 const SIDEBAR_SECTIONS: SidebarSection[] = [
   {
-    title: "Dashboard",
+    title: "",
     items: [
-      { label: "Dashboard", icon: "dashboard", path: "/" },
-      { label: "Campus Map", icon: "map", path: "/map" },
+      { label: "Home", icon: "home", path: "/" },
       { label: "Search", icon: "search", path: "/search" },
-      { label: "Profile", icon: "person", path: "/profile" }
+      { label: "Alerts", icon: "notifications", path: "/notifications" }
     ]
   },
   {
-    title: "Academics",
+    title: "Learn",
     items: [
-      { label: "My Courses", icon: "menu_book", path: "/courses" },
-      { label: "Assessments", icon: "assignment", path: "/assessments" },
+      { label: "Courses", icon: "menu_book", path: "/courses" },
       { label: "Assignments", icon: "assignment", path: "/assignments" },
-      { label: "QR Scanner", icon: "qr_code_scanner", path: "/qr-scanner" },
-      { label: "Timetable", icon: "calendar_month", path: "/timetable" },
-      { label: "Results", icon: "account_balance", path: "/results" }
+      { label: "Assessments", icon: "quiz", path: "/assessments" },
+      { label: "Resources", icon: "folder_open", path: "/resources" },
+      { label: "Notes", icon: "edit_note", path: "/notes" },
+      { label: "Quick Recap", icon: "style", path: "/quick-recap" },
+      { label: "AI Tutor", icon: "smart_toy", path: "/ai-tutor" }
     ]
   },
   {
-    title: "University",
+    title: "Plan",
     items: [
-      { label: "Payments", icon: "receipt_long", path: "/payments" },
+      { label: "Timetable", icon: "calendar_month", path: "/timetable" },
+      { label: "Tasks", icon: "checklist", path: "/tasks" },
+      { label: "Focus Mode", icon: "timer", path: "/focus-mode" },
+      { label: "Results", icon: "school", path: "/results" },
+      { label: "Payments", icon: "receipt_long", path: "/payments" }
+    ]
+  },
+  {
+    title: "Progress",
+    items: [
+      { label: "Badges", icon: "military_tech", path: "/badges" },
+      { label: "Leaderboard", icon: "leaderboard", path: "/leaderboard" },
+      { label: "Avatar", icon: "face", path: "/avatar" }
+    ]
+  },
+  {
+    title: "Campus",
+    items: [
+      { label: "Map", icon: "map", path: "/map" },
+      { label: "Study Groups", icon: "group", path: "/study-groups" },
       { label: "Community", icon: "forum", path: "/community" },
+      { label: "QR Scanner", icon: "qr_code_scanner", path: "/qr-scanner" },
       { label: "Helpdesk", icon: "support_agent", path: "/helpdesk" }
     ]
   },
   {
-    title: "Productivity",
+    title: "System",
     items: [
-      { label: "Tasks", icon: "checklist", path: "/tasks" },
-      { label: "Notes", icon: "edit_note", path: "/notes" },
-      { label: "Alerts", icon: "notifications", path: "/notifications" },
-      { label: "Queue Manager", icon: "sync", path: "/queue-manager" },
-      { label: "Focus Mode", icon: "timer", path: "/focus-mode" },
-      { label: "Quick Recap", icon: "quickreply", path: "/quick-recap" },
-      { label: "AI Tutor", icon: "smart_toy", path: "/ai-tutor" },
-      { label: "Resources", icon: "folder_open", path: "/resources" },
-      { label: "Study Groups", icon: "group", path: "/study-groups" }
-    ]
-  },
-  {
-    title: "Gamification",
-    items: [
-      { label: "Leaderboard", icon: "leaderboard", path: "/leaderboard" },
-      { label: "Badges", icon: "stars", path: "/badges" },
-      { label: "Avatar", icon: "face", path: "/avatar" }
+      { label: "Sync Queue", icon: "sync", path: "/queue-manager" },
+      { label: "Profile", icon: "person", path: "/profile" }
     ]
   }
 ];

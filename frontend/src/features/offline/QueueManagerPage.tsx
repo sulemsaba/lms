@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import SyncHealthCard from "@/components/offline/SyncHealthCard";
 import { refreshSyncQueueMetrics, syncWithExponentialBackoff } from "@/services/sync/backgroundSync";
 import { db, type OfflineAction } from "@/services/db";
+import { useSyncStore } from "@/stores/syncStore";
 import styles from "./QueueManagerPage.module.css";
 
 function sortActions(actions: OfflineAction[]): OfflineAction[] {
@@ -17,6 +19,9 @@ export default function QueueManagerPage() {
   const [actions, setActions] = useState<OfflineAction[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const lastSync = useSyncStore((state) => state.lastSync);
+  const pendingCount = useSyncStore((state) => state.pendingCount);
+  const pendingSize = useSyncStore((state) => state.pendingSize);
 
   const loadActions = async () => {
     const rows = await db.offlineActions.toArray();
@@ -84,6 +89,7 @@ export default function QueueManagerPage() {
 
   return (
     <section className={styles.stack}>
+      <SyncHealthCard lastSync={lastSync} pendingCount={pendingCount} pendingSize={pendingSize} />
       <Card>
         <h2>Queue Manager</h2>
         <p>Pending: {counts.pending} | Failed: {counts.failed} | Syncing: {counts.syncing}</p>

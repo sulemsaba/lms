@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
@@ -7,7 +7,6 @@ import SidebarNav from "@/components/layout/SidebarNav";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import MobileDrawer from "@/components/layout/MobileDrawer";
 import OfflineBanner from "@/components/offline/OfflineBanner";
-import SyncHealthCard from "@/components/offline/SyncHealthCard";
 import { formatRoleLabel, getLandingPath, getPortalSubtitle, getPortalTitle } from "@/features/auth/roleAccess";
 import {
   selectEffectivePermissions,
@@ -22,10 +21,7 @@ import styles from "./AppShell.module.css";
  */
 export default function AppShell() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const lastSync = useSyncStore((state) => state.lastSync);
-  const pendingCount = useSyncStore((state) => state.pendingCount);
-  const pendingSize = useSyncStore((state) => state.pendingSize);
   const syncStatus = useSyncStore((state) => state.syncStatus);
   const roleCodes = useAuthStore(selectEffectiveRoleCodes);
   const permissions = useAuthStore(selectEffectivePermissions);
@@ -73,8 +69,8 @@ export default function AppShell() {
       
       <div className={styles.mainPanel}>
         {/* Sticky header row with hamburger on mobile */}
-        <div className={styles.mobileHeaderWrapper}>
-          {isMobile && (
+        {isMobile ? (
+          <div className={styles.mobileHeaderWrapper}>
             <button
               className={styles.hamburgerButton}
               onClick={() => setMobileDrawerOpen(true)}
@@ -82,9 +78,9 @@ export default function AppShell() {
             >
               <Icon name="menu" size={22} />
             </button>
-          )}
-          <Header title={portalTitle} subtitle={portalSubtitle} />
-        </div>
+            <Header title={portalTitle} subtitle={portalSubtitle} />
+          </div>
+        ) : null}
         <main className={styles.content}>
           {impersonatedRoleCode ? (
             <div className={styles.impersonationBanner}>
@@ -98,9 +94,6 @@ export default function AppShell() {
             </div>
           ) : null}
           {showOfflineBanner ? <OfflineBanner lastSync={lastSync ?? undefined} /> : null}
-          {pathname === "/" ? (
-            <SyncHealthCard lastSync={lastSync} pendingCount={pendingCount} pendingSize={pendingSize} />
-          ) : null}
           <Outlet />
         </main>
       </div>

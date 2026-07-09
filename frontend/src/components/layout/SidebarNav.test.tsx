@@ -75,9 +75,8 @@ describe("SidebarNav", () => {
 
   it("renders the sidebar with brand information", () => {
     renderSidebar();
-    
-    expect(screen.getByText("UDSM Hub")).toBeInTheDocument();
-    expect(screen.getByText("Sharp Minds, Brave Futures")).toBeInTheDocument();
+
+    expect(screen.getByText("Student Hub")).toBeInTheDocument();
   });
 
   it("renders navigation sections", () => {
